@@ -232,16 +232,17 @@ onMouseLeave={(e) =>
       </div>
 
       <div style={styles.editorContainer}>
-        <div style={styles.editorBox}>
+        <div style={styles.editorBox}
+        onClick={() => setShowFullSuggestion(false)}>
           <textarea
             value={text}
             onChange={handleChange}
            placeholder="What’s on your mind today?"
             style={styles.textarea}
             onFocus={(e) =>
-    (e.currentTarget.parentElement!.style.boxShadow =
-      "0 0 100px rgba(120,80,255,0.15)")
-  }
+  (e.currentTarget.parentElement!.style.boxShadow =
+    "0 0 120px rgba(120,80,255,0.25)")
+}
 
   onBlur={(e) =>
     (e.currentTarget.parentElement!.style.boxShadow =
@@ -254,10 +255,10 @@ onMouseLeave={(e) =>
           {/* 💡 Full Suggestion */}
          {shouldSuggest && (
   <div
-    onMouseEnter={() => setShowFullSuggestion(true)}
-    onMouseLeave={() => setShowFullSuggestion(false)}
-  >
-    <div style={styles.suggestionHint}>→</div>
+    onClick={() => setShowFullSuggestion(prev => !prev)}
+    style={styles.suggestionButton}
+  > Continue →
+    
 
     {showFullSuggestion && (
       <div
@@ -285,6 +286,7 @@ onMouseLeave={(e) =>
               setLastSuggestion(random);
             }
           }
+          setShowFullSuggestion(false);
         }}
       >
         {isStruggling
@@ -390,9 +392,9 @@ button: {
   },
 
   editorBox: {
-    width: "80%",
+    width: "90%",
     maxWidth: "800px",
-    padding: "50px",
+    padding: "30px",
     borderRadius: "20px",
 
     background: "rgba(255,255,255,0.02)",
@@ -414,8 +416,8 @@ button: {
     outline: "none",
     color: "#f1f1f1",
     caretColor: "#a78bfa",
-    fontSize: "24px",
-    lineHeight: "2.1",
+    fontSize: "20px",
+    lineHeight: "1.8",
     letterSpacing: "0.5px",
     fontWeight: 300,
 
@@ -426,10 +428,11 @@ button: {
     marginTop: "30px",
     color: "#aaa",
      textAlign: "center" as const,
-    fontSize: "22px",
-    opacity: 0.7,
+    fontSize: "28px",
+    opacity: 0.9,
     cursor: "pointer",
     transition: "all 0.3s ease",
+    padding: "10px",
   },
 
   suggestion: {
@@ -465,6 +468,23 @@ dropdownItem: {
   color: "#ccc",
   cursor: "pointer",
   transition: "all 0.2s ease",
+},
+
+suggestionButton: {
+  marginTop: "25px",
+  padding: "12px 18px",
+  borderRadius: "20px",
+  background: "rgba(255,255,255,0.08)",
+  border: "1px solid rgba(255,255,255,0.1)",
+  color: "#ddd",
+  fontSize: "14px",
+  textAlign: "center" as const,
+  cursor: "pointer",
+  backdropFilter: "blur(10px)",
+  transition: "all 0.2s ease",
+  position: "absolute" as const,
+  bottom: "20px",
+  right: "20px",
 },
 
 };
