@@ -24,6 +24,17 @@ const improveText = () => {
   if (!text) return;
 
   let improved = text;
+  const dictionary: Record<string, string> = {
+  studet: "student",
+  outpy: "output",
+  becuase: "because",
+  teh: "the",
+};
+
+improved = improved
+  .split(" ")
+  .map(word => dictionary[word.toLowerCase()] || word)
+  .join(" ");
 
   // 1. Fix lowercase "i"
   improved = improved.replace(/\bi\b/g, "I");
