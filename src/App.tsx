@@ -7,6 +7,7 @@ function App() {
   const [text, setText] = useState("");
   const [showSuggestion, setShowSuggestion] = useState(false);
   const [showDropdown, setShowDropdown] = useState(false);
+  const [mode, setMode] = useState<"fix" | "improve">("fix");
 
   const timeoutRef = useRef<number | null>(null);
 
@@ -20,8 +21,8 @@ function App() {
   };
 
 const [loading, setLoading] = useState(false);
-const improveText = async () => {
-  console.log("BUTTON CLICKED");
+const improveText = async (selectedMode: "fix" | "improve") => {
+  setLoading(true);
 
   try {
     const res = await fetch("http://localhost:3001/improve", {
@@ -29,25 +30,24 @@ const improveText = async () => {
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ text }),
+      body: JSON.stringify({
+        text,
+        mode: selectedMode,
+      }),
     });
 
     const data = await res.json();
 
-    console.log("Backend response:", data);
-
     if (data.result) {
-      setText(data.result);  // ✅ THIS IS THE FIX
-    } else {
-      setText("No response 😅");
+      setText(data.result);
     }
 
   } catch (err) {
-    console.error("Error:", err);
-    setText("Error connecting to server");
+    console.error(err);
   }
-};
 
+  setLoading(false);
+};
 
 
 
@@ -162,16 +162,37 @@ const improveText = async () => {
             style={styles.textarea}
           />
 
-          {true && (
+          {text.length > 5 && (
+<div style={{ display: "flex", gap: "10px" }}>
+  
+  {/* FIX BUTTON */}
   <div
-  style={{
-    ...styles.suggestionButton,
-    opacity: loading ? 0.6 : 1,
-    pointerEvents: loading ? "none" : "auto",
-  }}
-  onClick={improveText}
->
-  {loading ? "Thinking..." : "Improve ✨"}
+    style={{
+      ...styles.suggestionButton,
+      opacity: loading ? 0.6 : 1,
+    }}
+    onClick={() => {
+      setMode("fix");
+      improveText("fix");
+    }}
+  >
+    ✏️ Fix
+  </div>
+
+  {/* IMPROVE BUTTON */}
+  <div
+    style={{
+      ...styles.suggestionButton,
+      opacity: loading ? 0.6 : 1,
+    }}
+    onClick={() => {
+      setMode("improve");
+      improveText("improve");
+    }}
+  >
+    {loading && mode === "improve" ? "Thinking..." : "Improve ✨"}
+  </div>
+
 </div>
 )}
         </div>
