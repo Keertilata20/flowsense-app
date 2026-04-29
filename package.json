@@ -10,9 +10,13 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "cors": "^2.8.6",
     "docx": "^9.6.1",
+    "dotenv": "^17.4.2",
+    "express": "^5.2.1",
     "file-saver": "^2.0.5",
     "jspdf": "^4.2.1",
+    "node-fetch": "^3.3.2",
     "react": "^19.2.5",
     "react-dom": "^19.2.5"
   },

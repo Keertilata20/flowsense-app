@@ -19,42 +19,37 @@ function App() {
     localStorage.setItem("flowsense", text);
   };
 
+const [loading, setLoading] = useState(false);
+const improveText = async () => {
+  console.log("BUTTON CLICKED");
 
-const improveText = () => {
-  if (!text) return;
+  try {
+    const res = await fetch("http://localhost:3001/improve", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ text }),
+    });
 
-  let improved = text;
-  const dictionary: Record<string, string> = {
-  studet: "student",
-  outpy: "output",
-  becuase: "because",
-  teh: "the",
+    const data = await res.json();
+
+    console.log("Backend response:", data);
+
+    if (data.result) {
+      setText(data.result);  // ✅ THIS IS THE FIX
+    } else {
+      setText("No response 😅");
+    }
+
+  } catch (err) {
+    console.error("Error:", err);
+    setText("Error connecting to server");
+  }
 };
 
-improved = improved
-  .split(" ")
-  .map(word => dictionary[word.toLowerCase()] || word)
-  .join(" ");
 
-  // 1. Fix lowercase "i"
-  improved = improved.replace(/\bi\b/g, "I");
 
-  // 2. Add space after period if missing
-  improved = improved.replace(/\.(\S)/g, ". $1");
-
-  // 3. Remove extra spaces
-  improved = improved.replace(/\s+/g, " ").trim();
-
-  // 4. Normalize multiple dots → single dot
-  improved = improved.replace(/\.{2,}/g, ".");
-
-  // 5. Capitalize sentence starts
-  improved = improved.replace(/(^\s*\w|[.!?]\s*\w)/g, (c) =>
-    c.toUpperCase()
-  );
-
-  setText(improved);
-};
 
     const handleChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     const textarea = e.target;
@@ -167,10 +162,17 @@ improved = improved
             style={styles.textarea}
           />
 
-          {showSuggestion && (
-  <div style={styles.suggestionButton} onClick={improveText}>
-    Improve ✨
-  </div>
+          {true && (
+  <div
+  style={{
+    ...styles.suggestionButton,
+    opacity: loading ? 0.6 : 1,
+    pointerEvents: loading ? "none" : "auto",
+  }}
+  onClick={improveText}
+>
+  {loading ? "Thinking..." : "Improve ✨"}
+</div>
 )}
         </div>
       </div>
