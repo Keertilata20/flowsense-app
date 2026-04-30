@@ -153,7 +153,7 @@ const improveText = async (selectedMode: "fix" | "improve") => {
         </div>
       </div>
 
-      <div style={styles.editorContainer}>
+      <div style={styles.editorWrapper}><div style={styles.editorContainer}>
         <div style={styles.editorBox}>
           <textarea
             value={text}
@@ -163,14 +163,10 @@ const improveText = async (selectedMode: "fix" | "improve") => {
           />
 
           {text.length > 5 && (
-<div style={{ display: "flex", gap: "10px" }}>
-  
+<div style={styles.buttonContainer}>
   {/* FIX BUTTON */}
   <div
-    style={{
-      ...styles.suggestionButton,
-      opacity: loading ? 0.6 : 1,
-    }}
+    style={styles.button}
     onClick={() => {
       setMode("fix");
       improveText("fix");
@@ -181,10 +177,7 @@ const improveText = async (selectedMode: "fix" | "improve") => {
 
   {/* IMPROVE BUTTON */}
   <div
-    style={{
-      ...styles.suggestionButton,
-      opacity: loading ? 0.6 : 1,
-    }}
+    style={styles.button}
     onClick={() => {
       setMode("improve");
       improveText("improve");
@@ -192,11 +185,11 @@ const improveText = async (selectedMode: "fix" | "improve") => {
   >
     {loading && mode === "improve" ? "Thinking..." : "Improve ✨"}
   </div>
-
 </div>
 )}
         </div>
-      </div>
+      </div></div>
+      
     </div>
   );
 }
@@ -256,15 +249,6 @@ const styles = {
     gap: "10px",
   },
 
-  button: {
-    background: "rgba(255,255,255,0.05)",
-    border: "1px solid rgba(255,255,255,0.08)",
-    color: "#ccc",
-    padding: "6px 12px",
-    borderRadius: "8px",
-    cursor: "pointer",
-  },
-
   editorContainer: {
     flex: 1,
     display: "flex",
@@ -273,7 +257,10 @@ const styles = {
   },
 
   editorBox: {
-    position: "relative" as const,
+    
+    display: "flex",
+    flexDirection : "column" as const,
+    overflow: "auto",
     width: "90%",
     maxWidth: "800px",
     padding: "30px",
@@ -285,6 +272,8 @@ const styles = {
   textarea: {
     width: "100%",
     minHeight: "200px",
+    maxHeight: "300px",
+  overflowY: "auto" as const,
     background: "transparent",
     border: "none",
     outline: "none",
@@ -322,6 +311,27 @@ const styles = {
     padding: "6px 10px",
     cursor: "pointer",
   },
+  buttonContainer: {
+ 
+ display: "flex",
+  gap: "10px",
+  justifyContent: "flex-end",
+  padding: "10px 15px",
+},
+
+button: {
+  padding: "10px 16px",
+  borderRadius: "20px",
+  background: "rgba(255,255,255,0.08)",
+  cursor: "pointer",
+  backdropFilter: "blur(10px)"
+},
+editorWrapper: {
+  display: "flex",
+  flexDirection: "column" as const,
+  gap: "10px",
+},
+
 };
 
 export default App;
