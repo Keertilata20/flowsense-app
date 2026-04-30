@@ -12,16 +12,29 @@ app.post("/improve", async (req, res) => {
   try {
     // ✏️ FIX MODE (LanguageTool)
     if (mode === "fix") {
-      const response = await fetch("https://api.languagetool.org/v2/check", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/x-www-form-urlencoded",
-        },
-        body: new URLSearchParams({
-          text,
-          language: "en-US",
-        }),
-      });
+     const response = await fetch("https://api.groq.com/openai/v1/chat/completions", {
+  method: "POST",
+  headers: {
+    "Content-Type": "application/json",
+    Authorization: `Bearer ${process.env.GROQ_API_KEY}`,
+  },
+  body: JSON.stringify({
+    model: "mixtral-8x7b-32768", // 👈 FIXED
+    messages: [
+      {
+        role: "system",
+        content:
+          mode === "fix"
+            ? "Fix grammar and spelling ONLY. Do not rewrite."
+            : "Improve this sentence to sound natural and fluent.",
+      },
+      {
+        role: "user",
+        content: text,
+      },
+    ],
+  }),
+});
 
       const data = await response.json();
 
