@@ -206,7 +206,7 @@ const styles = {
   },
 
   topBar: {
-    position: "fixed" as const,
+    
     top: "20px",
     left: "50%",
     transform: "translateX(-50%)",
