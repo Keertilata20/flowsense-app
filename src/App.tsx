@@ -8,6 +8,7 @@ function App() {
   const [showSuggestion, setShowSuggestion] = useState(false);
   const [showDropdown, setShowDropdown] = useState(false);
   const [mode, setMode] = useState<"fix" | "improve">("fix");
+  const [improvedText, setImprovedText] = useState("");
 
   const timeoutRef = useRef<number | null>(null);
 
@@ -199,7 +200,7 @@ const styles = {
     height: "100vh",
     display: "flex",
     flexDirection: "column" as const,
-    background: "#0f0f12",
+    background: "linear-gradient(to bottom right,#f8fafc,#eef2ff)",
     color: "#fff",
     fontFamily: "Inter, sans-serif",
   },
@@ -272,7 +273,7 @@ const styles = {
   textarea: {
     width: "100%",
     minHeight: "200px",
-    maxHeight: "300px",
+    
   overflowY: "auto" as const,
     background: "transparent",
     border: "none",
