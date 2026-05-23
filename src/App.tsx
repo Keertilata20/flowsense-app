@@ -169,12 +169,12 @@ const improveText = async (selectedMode: "fix" | "improve") => {
 Write naturally. FlowSense will refine clarity and rhythm.
 </p>
 
-        <textarea
-          value={text}
-          onChange={handleChange}
-          placeholder="Start writing..."
-          className="textarea"
-        />
+        <div className="editor-surface">
+  <textarea
+    className="textarea"
+    placeholder="Start writing..."
+  />
+</div>
 
         <div className="action-buttons">
 

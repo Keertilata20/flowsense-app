@@ -419,7 +419,7 @@ min-height: 220px;
 
   background: transparent;
 
-  font-size: 17px;
+  font-size: 18px;
   line-height: 1.8;
 
   color: #1e293b;
@@ -431,7 +431,34 @@ margin-bottom: 20px;
 
 caret-color: #6366f1;
 
-color: #0f172a;
+color:
+#20263A;
+}
+.textarea::placeholder {
+  color:
+  rgba(76,90,133,.48);
+}
+
+.editor-surface {
+  background:
+  rgba(255,255,255,.48);
+
+  border:
+  1px solid
+  rgba(76,90,133,.05);
+
+  border-radius:
+  18px;
+
+  padding:
+  22px;
+
+  margin-top:
+  18px;
+
+  box-shadow:
+  inset 0 1px 0
+  rgba(255,255,255,.55);
 }
 
 /* OUTPUT */
@@ -459,7 +486,7 @@ justify-content: center;
   gap: 14px;
   align-items: center;
 position: relative;
-top: -10px;
+top: -4px;
   margin-top: 16px;
   align-self: flex-start;
 }
