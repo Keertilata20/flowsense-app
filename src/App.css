@@ -464,11 +464,11 @@ justify-content: center;
 .action-buttons button {
   border: none;
 
-  padding: 10px 18px;
+  padding: 9px 16px;
 
   border-radius: 12px;
 
-  font-size: 15px;
+  font-size: 14px;
   font-weight: 450;
   letter-spacing: -0.2px;
 
@@ -495,8 +495,7 @@ rgba(76,90,133,.08);
 }
 
 .primary-btn {
-background:
-#5F6E98;
+background:#61719A;
 
 color:white;
 
