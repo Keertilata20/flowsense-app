@@ -118,9 +118,26 @@ const improveText = async (selectedMode: "fix" | "improve") => {
 
     <header className="navbar">
       <div className="logo">
-        <div className="logo-dot"></div>
-        <h2>FlowSense</h2>
-      </div>
+  <div className="logo-icon">
+    ✦
+  </div>
+
+  <h2>FlowSense</h2>
+</div>
+
+<div className="nav-center">
+  <button className="nav-tab active">
+    Write
+  </button>
+
+  <button className="nav-tab">
+    History
+  </button>
+
+  <button className="nav-tab">
+    Insights
+  </button>
+</div>
 
       <div className="nav-actions">
         <button onClick={handleNew}>New</button>
@@ -129,10 +146,13 @@ const improveText = async (selectedMode: "fix" | "improve") => {
     </header>
 
     <section className="hero">
-      <h1>Writing that flows naturally.</h1>
+      <h1>
+  Writing that <span>flows</span> naturally.
+</h1>
       <p>
         AI-powered clarity, rhythm, and refinement.
       </p>
+      <div className="hero-accent"></div>
     </section>
 
     <main className="workspace">
@@ -159,7 +179,7 @@ Write naturally. FlowSense will refine clarity and rhythm.
               improveText("fix");
             }}
           >
-            ✏️ Fix
+             Fix
           </button>
 
           <button
@@ -170,7 +190,7 @@ Write naturally. FlowSense will refine clarity and rhythm.
           >
             {loading && mode === "improve"
               ? "Thinking..."
-              : "✨ Improve"}
+              : " Improve"}
           </button>
 
         </div>
