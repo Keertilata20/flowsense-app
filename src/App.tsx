@@ -140,6 +140,9 @@ const improveText = async (selectedMode: "fix" | "improve") => {
       {/* LEFT PANEL */}
       <div className="panel">
         <h3>Your Writing</h3>
+        <p className="panel-subtext">
+Write naturally. FlowSense will refine clarity and rhythm.
+</p>
 
         <textarea
           value={text}
@@ -175,7 +178,10 @@ const improveText = async (selectedMode: "fix" | "improve") => {
 
       {/* RIGHT PANEL */}
       <div className="panel">
-        <h3>FlowSense Output</h3>
+        <h3>AI Refinement</h3>
+        <p className="panel-subtext">
+AI-enhanced writing appears here.
+</p>
 
         <div className="output-box">
           {improvedText || "Your improved writing will appear here."}
