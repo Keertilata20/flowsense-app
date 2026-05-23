@@ -152,10 +152,10 @@ const improveText = async (selectedMode: "fix" | "improve") => {
 
     <section className="hero">
       <h1>
-  Writing that <span>flows</span> naturally.
+  Writing that <span><i>flows</i></span> naturally
 </h1>
       <p>
-        AI-powered clarity, rhythm, and refinement.
+        AI-powered clarity, rhythm and refinement
       </p>
       <div className="hero-accent"></div>
     </section>
