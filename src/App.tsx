@@ -3,6 +3,7 @@ import jsPDF from "jspdf";
 import { Document, Packer, Paragraph } from "docx";
 import { saveAs } from "file-saver";
 import "./App.css";
+import logo from "./assets/logo.png";
 
 function App() {
   const [text, setText] = useState("");
@@ -119,8 +120,12 @@ const improveText = async (selectedMode: "fix" | "improve") => {
     <header className="navbar">
       <div className="logo">
   <div className="logo-icon">
-    ✦
-  </div>
+  <img
+    src={logo}
+    alt="FlowSense logo"
+    className="logo-image"
+  />
+</div>
 
   <h2>FlowSense</h2>
 </div>
@@ -158,7 +163,7 @@ const improveText = async (selectedMode: "fix" | "improve") => {
     <main className="workspace">
 
       {/* LEFT PANEL */}
-      <div className="panel">
+      <div className="panel editor-panel">
         <h3>Your Writing</h3>
         <p className="panel-subtext">
 Write naturally. FlowSense will refine clarity and rhythm.
@@ -173,7 +178,7 @@ Write naturally. FlowSense will refine clarity and rhythm.
 
         <div className="action-buttons">
 
-          <button
+          <button className="secondary-btn"
             onClick={() => {
               setMode("fix");
               improveText("fix");
@@ -182,7 +187,7 @@ Write naturally. FlowSense will refine clarity and rhythm.
              Fix
           </button>
 
-          <button
+          <button  className="primary-btn"
             onClick={() => {
               setMode("improve");
               improveText("improve");
@@ -197,7 +202,7 @@ Write naturally. FlowSense will refine clarity and rhythm.
       </div>
 
       {/* RIGHT PANEL */}
-      <div className="panel">
+      <div className="panel ai-panel">
         <h3>AI Refinement</h3>
         <p className="panel-subtext">
 AI-enhanced writing appears here.
