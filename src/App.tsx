@@ -162,58 +162,52 @@ const improveText = async (selectedMode: "fix" | "improve") => {
 
     <main className="workspace">
 
-      {/* LEFT PANEL */}
-      <div className="panel editor-panel">
-        <h3>Your Writing</h3>
-        <p className="panel-subtext">
-Write naturally. FlowSense will refine clarity and rhythm.
-</p>
+  <div className="panel editor-panel">
 
-        <div className="editor-surface">
-  <textarea
-    className="textarea"
-    placeholder="Start writing..."
-  />
-</div>
+    <h3>Your Writing</h3>
 
-        <div className="action-buttons">
+    <p className="panel-subtext">
+      Write naturally. FlowSense stays quietly nearby.
+    </p>
 
-          <button className="secondary-btn"
-            onClick={() => {
-              setMode("fix");
-              improveText("fix");
-            }}
-          >
-             Fix
-          </button>
+    <div className="editor-surface">
+      <textarea
+        value={text}
+        onChange={handleChange}
+        placeholder="Start writing..."
+        className="textarea"
+      />
+    </div>
 
-          <button  className="primary-btn"
-            onClick={() => {
-              setMode("improve");
-              improveText("improve");
-            }}
-          >
-            {loading && mode === "improve"
-              ? "Thinking..."
-              : " Improve"}
-          </button>
+    <div className="action-buttons">
 
-        </div>
-      </div>
+      <button
+        className="secondary-btn"
+        onClick={() => {
+          setMode("fix");
+          improveText("fix");
+        }}
+      >
+        Fix
+      </button>
 
-      {/* RIGHT PANEL */}
-      <div className="panel ai-panel">
-        <h3>AI Refinement</h3>
-        <p className="panel-subtext">
-AI-enhanced writing appears here.
-</p>
+      <button
+        className="primary-btn"
+        onClick={() => {
+          setMode("improve");
+          improveText("improve");
+        }}
+      >
+        {loading && mode === "improve"
+          ? "Thinking..."
+          : "Improve"}
+      </button>
 
-        <div className="output-box">
-          {improvedText || "Your improved writing will appear here."}
-        </div>
-      </div>
+    </div>
 
-    </main>
+  </div>
+
+</main>
 
   </div>
 );
