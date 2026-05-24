@@ -31,6 +31,7 @@ The goal is not to replace writing, but to support it.
 
 - React
 - CSS3
+- TypeScript
 - JavaScript
 - AI integration *(ongoing)*
 
@@ -40,9 +41,7 @@ FlowSense is being designed as more than an editor.
 
 It is an intelligent writing companion that respects the writing process, appearing when needed and remaining invisible when not.
 
-## 📸 Preview
 
-(Add screenshots here)
 
 ## Installation
 
