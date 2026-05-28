@@ -6,7 +6,7 @@ Unlike traditional AI writing tools that place assistance at the center, FlowSen
 
 ## 🌿 Idea
 
-Writing should feel human first.
+Writing should fee
 
 FlowSense creates a clean writing environment where users can:
 
