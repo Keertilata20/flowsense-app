@@ -70,4 +70,4 @@ UI, writing flow and AI behaviour are continuously evolving.
 
 ---
 
-***Write naturally. FlowSense stays quietly nearby !!***
+***Write naturally. FlowSense stays quietly nearby***
