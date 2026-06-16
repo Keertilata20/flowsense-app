@@ -19,7 +19,6 @@ The goal is not to replace writing, but to support it.
 ## ✨ Features
 
 - Minimal and distraction-free editor
-- Soft, notebook-inspired UI
 - Writing-first experience
 - AI refinement tools
 - Improve and Fix actions
