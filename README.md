@@ -63,7 +63,7 @@ npm run dev
 
 ## Status
 
-🚧 Under active development
+Under active development
 
 UI, writing flow and AI behaviour are continuously evolving.
 
