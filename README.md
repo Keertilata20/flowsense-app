@@ -19,8 +19,8 @@ The goal is not to replace writing, but to support it.
 ## ✨ Features
 
 - Minimal and distraction-free editor
-- Writing-first experience
 - AI refinement tools
+- Writing-first experience
 - Improve and Fix actions
 - Save and history support
 - Insight-driven writing assistance *(in progress)*
