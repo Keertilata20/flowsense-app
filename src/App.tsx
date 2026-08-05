@@ -1,218 +1,160 @@
-import { useState, useRef, useEffect } from "react";
+import { useEffect, useRef, useState } from "react";
 import jsPDF from "jspdf";
 import { Document, Packer, Paragraph } from "docx";
 import { saveAs } from "file-saver";
 import "./App.css";
 import logo from "./assets/logo.png";
 
-function App() {
-  const [text, setText] = useState("");
-  const [showSuggestion, setShowSuggestion] = useState(false);
-  const [showDropdown, setShowDropdown] = useState(false);
-  const [mode, setMode] = useState<"fix" | "improve">("fix");
-  const [improvedText, setImprovedText] = useState("");
+type Mode = "fix" | "improve";
+type Tab = "write" | "history" | "insights";
+type Draft = { id: string; text: string; savedAt: string };
 
-  const timeoutRef = useRef<number | null>(null);
+const API_URL = import.meta.env.VITE_API_URL ?? "http://localhost:3001";
+
+function App() {
+  const [text, setText] = useState(() => localStorage.getItem("flowsense-draft") ?? "");
+  const [tab, setTab] = useState<Tab>("write");
+  const [suggestion, setSuggestion] = useState("");
+  const [suggestionMode, setSuggestionMode] = useState<Mode>("improve");
+  const [loading, setLoading] = useState<Mode | null>(null);
+  const [autoHelp, setAutoHelp] = useState(true);
+  const [notice, setNotice] = useState("");
+  const [history, setHistory] = useState<Draft[]>(() => {
+    try { return JSON.parse(localStorage.getItem("flowsense-history") ?? "[]"); }
+    catch { return []; }
+  });
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const debounceRef = useRef<number | null>(null);
+  const lastAutoText = useRef("");
 
   useEffect(() => {
-    const saved = localStorage.getItem("flowsense");
-    if (saved) setText(saved);
+    localStorage.setItem("flowsense-draft", text);
+  }, [text]);
+
+  useEffect(() => () => {
+    if (debounceRef.current) window.clearTimeout(debounceRef.current);
   }, []);
 
-  const saveText = () => {
-    localStorage.setItem("flowsense", text);
-  };
+  const wordCount = text.trim() ? text.trim().split(/\s+/).length : 0;
+  const charCount = text.length;
+  const sentenceCount = text.trim() ? (text.match(/[.!?]+(?=\s|$)/g)?.length ?? 1) : 0;
+  const readingMinutes = Math.max(1, Math.ceil(wordCount / 200));
 
-const [loading, setLoading] = useState(false);
-const improveText = async (selectedMode: "fix" | "improve") => {
-  setLoading(true);
-
-  try {
-    const res = await fetch("http://localhost:3001/improve", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        text,
-        mode: selectedMode,
-      }),
-    });
-
-    const data = await res.json();
-
-    if (data.result) {
-      setImprovedText(data.result);
+  const requestSuggestion = async (mode: Mode, source = text) => {
+    if (!source.trim()) {
+      setNotice("Write a little something first, then I can help.");
+      return;
     }
+    setLoading(mode);
+    setNotice("");
+    try {
+      const response = await fetch(`${API_URL}/improve`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ text: source, mode }),
+      });
+      if (!response.ok) throw new Error("Suggestion service unavailable");
+      const data = await response.json();
+      if (!data.result) throw new Error("No suggestion returned");
+      setSuggestion(data.result);
+      setSuggestionMode(mode);
+    } catch {
+      setNotice("I couldn't reach the writing helper. Make sure the local AI server is running, then try again.");
+    } finally {
+      setLoading(null);
+    }
+  };
 
-  } catch (err) {
-    console.error(err);
-  }
+  const handleChange = (event: React.ChangeEvent<HTMLTextAreaElement>) => {
+    const nextText = event.target.value;
+    setText(nextText);
+    setSuggestion("");
+    setNotice("");
+    event.target.style.height = "auto";
+    event.target.style.height = `${Math.max(event.target.scrollHeight, 250)}px`;
 
-  setLoading(false);
-};
-
-
-
-    const handleChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-    const textarea = e.target;
-
-    // auto expand
-    textarea.style.height = "auto";
-    textarea.style.height = textarea.scrollHeight + "px";
-
-    const newText = e.target.value;
-    setText(newText);
-
-    // STEP 1: last sentence detection
-    const sentences = newText.split(".");
-    const lastSentence = sentences[sentences.length - 1].trim();
-
-    console.log("Last sentence:", lastSentence);
-
-    // simple pause detection
-    if (timeoutRef.current) clearTimeout(timeoutRef.current);
-
-    timeoutRef.current = window.setTimeout(() => {
-      if (newText.length > 20) {
-        setShowSuggestion(true);
+    if (!autoHelp || nextText.trim().length < 40) return;
+    if (debounceRef.current) window.clearTimeout(debounceRef.current);
+    debounceRef.current = window.setTimeout(() => {
+      if (nextText !== lastAutoText.current) {
+        lastAutoText.current = nextText;
+        requestSuggestion("improve", nextText);
       }
-    }, 2000);
+    }, 1600);
   };
 
-  const downloadPDF = () => {
-    if (!text) return;
-
-    const doc = new jsPDF();
-    const lines = doc.splitTextToSize(text, 180);
-    doc.text(lines, 10, 10);
-    doc.save("flowsense.pdf");
-  };
-
-  const downloadDOCX = async () => {
-    if (!text) return;
-
-    const doc = new Document({
-      sections: [
-        {
-          children: [new Paragraph({ text })],
-        },
-      ],
-    });
-
-    const blob = await Packer.toBlob(doc);
-    saveAs(blob, "flowsense.docx");
-  };
-
-  const downloadTXT = () => {
-    const blob = new Blob([text], { type: "text/plain;charset=utf-8" });
-    saveAs(blob, "flowsense.txt");
+  const saveDraft = () => {
+    if (!text.trim()) {
+      setNotice("Nothing to save yet.");
+      return;
+    }
+    const draft = { id: crypto.randomUUID(), text, savedAt: new Date().toLocaleString() };
+    const nextHistory = [draft, ...history].slice(0, 12);
+    setHistory(nextHistory);
+    localStorage.setItem("flowsense-history", JSON.stringify(nextHistory));
+    setNotice("Saved to your writing history.");
   };
 
   const handleNew = () => {
     setText("");
-    setShowSuggestion(false);
+    setSuggestion("");
+    setNotice("Fresh page, ready when you are.");
+    window.setTimeout(() => textareaRef.current?.focus(), 0);
   };
 
- return (
-  <div className="app">
+  const downloadPDF = () => {
+    if (!text.trim()) return;
+    const document = new jsPDF();
+    document.text(document.splitTextToSize(text, 180), 15, 18);
+    document.save("flowsense-writing.pdf");
+  };
 
-    <header className="navbar">
-      <div className="logo">
-  <div className="logo-icon">
-  <img
-    src={logo}
-    alt="FlowSense logo"
-    className="logo-image"
-  />
-</div>
+  const downloadDOCX = async () => {
+    if (!text.trim()) return;
+    const document = new Document({ sections: [{ children: text.split(/\n/).map((line) => new Paragraph({ text: line })) }] });
+    saveAs(await Packer.toBlob(document), "flowsense-writing.docx");
+  };
 
-  <h2>FlowSense</h2>
-</div>
+  const downloadTXT = () => {
+    if (!text.trim()) return;
+    saveAs(new Blob([text], { type: "text/plain;charset=utf-8" }), "flowsense-writing.txt");
+  };
 
-<div className="nav-center">
-  <button className="nav-tab active">
-    Write
-  </button>
+  const renderWrite = () => (
+    <main className="workspace write-layout">
+      <section className="panel editor-panel">
+        <div className="panel-heading">
+          <div><h2>Your writing</h2><p>Write freely. Help appears when you want it.</p></div>
+          <label className="auto-toggle"><input type="checkbox" checked={autoHelp} onChange={(e) => setAutoHelp(e.target.checked)} /><span />Auto help</label>
+        </div>
+        <div className="editor-surface">
+          <textarea ref={textareaRef} value={text} onChange={handleChange} placeholder="Start writing your thought here..." className="textarea" aria-label="Writing editor" />
+          <div className="editor-footer"><span>{wordCount} words · {charCount} characters</span><span>{readingMinutes} min read</span></div>
+        </div>
+        <div className="action-buttons">
+          <button className="secondary-btn" disabled={loading !== null} onClick={() => requestSuggestion("fix")}>{loading === "fix" ? "Checking…" : "Fix writing"}</button>
+          <button className="primary-btn" disabled={loading !== null} onClick={() => requestSuggestion("improve")}>{loading === "improve" ? "Thinking…" : "Improve with AI"}</button>
+          <div className="export-menu"><button className="text-btn">Export</button><div className="export-options"><button onClick={downloadPDF}>PDF</button><button onClick={downloadDOCX}>Word</button><button onClick={downloadTXT}>Text</button></div></div>
+        </div>
+        {notice && <p className="notice" role="status">{notice}</p>}
+      </section>
 
-  <button className="nav-tab">
-    History
-  </button>
+      <aside className="panel helper-panel">
+        <div className="helper-heading"><div className="sparkle">✦</div><div><h2>FlowSense helper</h2><p>{autoHelp ? "Watching for a natural pause." : "Turn on Auto help for quiet suggestions."}</p></div></div>
+        {loading && <div className="helper-empty"><div className="dots"><i /><i /><i /></div><p>Looking for a smoother way to say it…</p></div>}
+        {!loading && suggestion && <div className="suggestion-card"><span className="suggestion-label">{suggestionMode === "fix" ? "Cleaned up" : "Suggested rewrite"}</span><p>{suggestion}</p><div className="suggestion-actions"><button className="secondary-btn" onClick={() => setSuggestion("")}>Dismiss</button><button className="primary-btn" onClick={() => { setText(suggestion); setSuggestion(""); setNotice("Suggestion applied."); }}>Use suggestion</button></div></div>}
+        {!loading && !suggestion && <div className="helper-empty"><div className="helper-orb">✦</div><h3>Keep your flow</h3><p>Use the buttons below your draft for a rewrite or a quick grammar pass. Pause while writing and Auto help can step in too.</p></div>}
+      </aside>
+    </main>
+  );
 
-  <button className="nav-tab">
-    Insights
-  </button>
-</div>
-
-      <div className="nav-actions">
-        <button onClick={handleNew}>New</button>
-        <button onClick={saveText}>Save</button>
-      </div>
-    </header>
-
-    <section className="hero">
-      <h1>
-  Writing that <span><i>flows</i></span> naturally
-</h1>
-      <p>
-        AI-powered clarity, rhythm and refinement
-      </p>
-      <div className="hero-accent"></div>
-    </section>
-
-    <main className="workspace">
-
-  <div className="panel editor-panel">
-
-    <h3>Your Writing</h3>
-
-    <p className="panel-subtext">
-      Write naturally. FlowSense stays quietly nearby.
-    </p>
-
-    <div className="editor-surface">
-      <textarea
-        value={text}
-        onChange={handleChange}
-        placeholder="Start writing..."
-        className="textarea"
-      />
-    </div>
-
-    <div className="action-buttons">
-
-      <button
-        className="secondary-btn"
-        onClick={() => {
-          setMode("fix");
-          improveText("fix");
-        }}
-      >
-        Fix
-      </button>
-
-      <button
-        className="primary-btn"
-        onClick={() => {
-          setMode("improve");
-          improveText("improve");
-        }}
-      >
-        {loading && mode === "improve"
-          ? "Thinking..."
-          : "Improve"}
-      </button>
-
-    </div>
-
-  </div>
-
-</main>
-
-  </div>
-);
+  return <div className="app">
+    <header className="navbar"><button className="logo" onClick={() => setTab("write")}><span className="logo-icon"><img src={logo} alt="" /></span><span>FlowSense</span></button><nav className="nav-center" aria-label="Workspace"><button className={tab === "write" ? "nav-tab active" : "nav-tab"} onClick={() => setTab("write")}>Write</button><button className={tab === "history" ? "nav-tab active" : "nav-tab"} onClick={() => setTab("history")}>History</button><button className={tab === "insights" ? "nav-tab active" : "nav-tab"} onClick={() => setTab("insights")}>Insights</button></nav><div className="nav-actions"><button onClick={handleNew}>New</button><button className="save-btn" onClick={saveDraft}>Save</button></div></header>
+    <section className="hero"><p className="eyebrow">A calmer way to write</p><h1>Writing that <em>flows</em> naturally</h1><p>Clarity, rhythm, and a helping hand when you need it.</p></section>
+    {tab === "write" && renderWrite()}
+    {tab === "history" && <main className="panel tab-panel"><h2>Writing history</h2><p className="panel-intro">Your saved drafts stay on this device.</p>{history.length ? <div className="history-list">{history.map((draft) => <button key={draft.id} className="history-item" onClick={() => { setText(draft.text); setTab("write"); setNotice("Saved draft opened."); }}><span>{draft.text.slice(0, 120) || "Untitled draft"}</span><small>{draft.savedAt}</small></button>)}</div> : <div className="empty-state">No saved drafts yet. Write something, then press Save.</div>}</main>}
+    {tab === "insights" && <main className="panel tab-panel"><h2>Writing insights</h2><p className="panel-intro">A quick pulse check on your current draft.</p><div className="insight-grid"><div><strong>{wordCount}</strong><span>Words</span></div><div><strong>{sentenceCount}</strong><span>Sentences</span></div><div><strong>{readingMinutes} min</strong><span>Reading time</span></div><div><strong>{wordCount && sentenceCount ? Math.round(wordCount / sentenceCount) : 0}</strong><span>Words / sentence</span></div></div><p className="insight-note">{wordCount < 25 ? "Start writing to unlock a clearer view of your rhythm." : wordCount / Math.max(sentenceCount, 1) > 24 ? "Your sentences are on the longer side. A few shorter ones can add more pace." : "Your sentence length has a comfortable, readable rhythm."}</p></main>}
+  </div>;
 }
-
-
 
 export default App;
