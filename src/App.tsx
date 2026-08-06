@@ -3,7 +3,7 @@ import jsPDF from "jspdf";
 import { Document, Packer, Paragraph } from "docx";
 import { saveAs } from "file-saver";
 import "./App.css";
-import logo from "./assets/logo.png";
+import Navbar from "./components/layout/Navbar";
 
 type Mode = "fix" | "improve";
 type Tab = "write" | "history" | "insights";
@@ -149,7 +149,12 @@ function App() {
   );
 
   return <div className="app">
-    <header className="navbar"><button className="logo" onClick={() => setTab("write")}><span className="logo-icon"><img src={logo} alt="" /></span><span>FlowSense</span></button><nav className="nav-center" aria-label="Workspace"><button className={tab === "write" ? "nav-tab active" : "nav-tab"} onClick={() => setTab("write")}>Write</button><button className={tab === "history" ? "nav-tab active" : "nav-tab"} onClick={() => setTab("history")}>History</button><button className={tab === "insights" ? "nav-tab active" : "nav-tab"} onClick={() => setTab("insights")}>Insights</button></nav><div className="nav-actions"><button onClick={handleNew}>New</button><button className="save-btn" onClick={saveDraft}>Save</button></div></header>
+    <Navbar
+    activeTab={tab}
+    setActiveTab={setTab}
+    onNew={handleNew}
+    onSave={saveDraft}
+/>
     <section className="hero"><p className="eyebrow">A calmer way to write</p><h1>Writing that <em>flows</em> naturally</h1><p>Clarity, rhythm, and a helping hand when you need it.</p></section>
     {tab === "write" && renderWrite()}
     {tab === "history" && <main className="panel tab-panel"><h2>Writing history</h2><p className="panel-intro">Your saved drafts stay on this device.</p>{history.length ? <div className="history-list">{history.map((draft) => <button key={draft.id} className="history-item" onClick={() => { setText(draft.text); setTab("write"); setNotice("Saved draft opened."); }}><span>{draft.text.slice(0, 120) || "Untitled draft"}</span><small>{draft.savedAt}</small></button>)}</div> : <div className="empty-state">No saved drafts yet. Write something, then press Save.</div>}</main>}
@@ -158,3 +163,6 @@ function App() {
 }
 
 export default App;
+
+
+
