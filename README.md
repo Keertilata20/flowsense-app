@@ -1,72 +1,67 @@
-# ✨ FlowSense
+# FlowSense
 
-FlowSense is an AI-assisted writing environment designed to feel natural, calm and distraction-free.
+**FlowSense** is a modern writing workspace designed for students who think, learn, and create every day.
 
-Unlike traditional AI writing tools that place assistance at the center, FlowSense begins as a normal writing space. The intelligence stays quietly nearby, offering support only when needed.
+Instead of treating writing as isolated documents, FlowSense provides a calm space where ideas, assignments, project notes, research, reflections, and professional writing can be captured, organized, and revisited whenever they are needed.
 
-## 🌿 Idea
+Our philosophy is simple:
 
+> **Write first. Organize naturally. Improve thoughtfully.**
 
-FlowSense creates a clean writing environment where users can:
-
-- Write naturally
-- Refine clarity and rhythm
-- Access AI help only when desired
-- Stay focused without overwhelming interfaces
-
-The goal is not to replace writing, but to support it.
+---
 
 ## ✨ Features
 
-- Minimal and distraction-free editor
-- AI refinement tools
-- Writing-first experience
-- Improve and Fix actions
-- Save and history support
-- Insight-driven writing assistance *(in progress)*
+-  Distraction-free writing experience
+-  Personal document library
+-  Instant document search
+-  Automatic local saving
+-  Export to PDF, Word and Text
+-  Writing insights and progress tracking
+-  Context-aware writing assistance
+-  Clean, minimal interface designed for focus
+
+---
+
+## 🚀 Vision
+
+Students create an enormous amount of valuable work throughout their academic journey:
+
+- Project ideas
+- Research notes
+- Assignments
+- LinkedIn posts
+- Internship reports
+- Interview preparation
+- Personal reflections
+
+Unfortunately, these ideas often become scattered across documents, chats, notes, and folders.
+
+FlowSense aims to become a single writing workspace where every piece of your thinking has a place to grow.
+
+---
+
+## 🛣️ Roadmap
+
+- ✅ Modern writing experience
+- ✅ Personal document library
+- ✅ Instant search
+- 🚧 Writing Spaces
+- 🚧 Writing Journey
+- 🚧 Thought Threads
+- 🚧 Intelligent writing companion
+
+---
 
 ## 🛠️ Tech Stack
 
 - React
-- CSS3
 - TypeScript
-- JavaScript
-- AI integration *(ongoing)*
-
-## 🚀 Vision
-
-FlowSense is being designed as more than an editor.
-
-It is an intelligent writing companion that respects the writing process, appearing when needed and remaining invisible when not.
-
-
-
-## Installation
-
-Clone the repository:
-
-```bash
-git clone <repo-link>
-```
-
-Install dependencies:
-
-```bash
-npm install
-```
-
-Run locally:
-
-```bash
-npm run dev
-```
-
-## Status
-
-Under active development
-
-UI, writing flow and AI behaviour are continuously evolving.
+- Tailwind CSS
+- Vite
+- Node.js
+- Express
 
 ---
 
-***Write naturally. FlowSense stays quietly nearby***
+> *Every idea deserves a place to grow.*
