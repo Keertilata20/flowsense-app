@@ -24,11 +24,10 @@
 }
 
 body {
-
   font-family: "Inter", sans-serif;
-
-  background: var(--bg);
-
+  margin: 0;
+  background: var(--canvas);
   color: var(--text);
-
 }
+
+#root { min-height: 100vh; }

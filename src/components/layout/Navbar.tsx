@@ -1,53 +1,23 @@
+import { BookOpen, FilePlus2, Save } from "lucide-react";
 import "./Navbar.css";
 
+type Tab = "write" | "history" | "insights";
+type NavbarProps = { activeTab: Tab; setActiveTab: (tab: Tab) => void; onNew: () => void; onSave: () => void };
 const tabs: Tab[] = ["write", "history", "insights"];
 
-type Tab = "write" | "history" | "insights";
-type NavbarProps = {
-  activeTab: Tab;
-  setActiveTab: (tab: Tab) => void;
-  onNew: () => void;
-  onSave: () => void;
-};
-
-export default function Navbar({
-  activeTab,
-  setActiveTab,
-  onNew,
-  onSave,
-}: NavbarProps) {
-  return (
-    <nav className="navbar">
-      <div className="navbar-left">
-        <div className="logo">
-          <span className="logo-icon">🌊</span>
-          <span>FlowSense</span>
-        </div>
-      </div>
-
-      <div className="navbar-center">
-        {tabs.map((tab) => (
-          <button
-            key={tab.charAt(0).toUpperCase() + tab.slice(1)}
-            className={`nav-link ${
-              activeTab === tab.toLowerCase() ? "active" : ""
-            }`}
-            onClick={() => setActiveTab(tab)}
-          >
-            {tab}
-          </button>
-        ))}
-      </div>
-
-      <div className="navbar-right">
-        <button className="secondary-btn" onClick={onNew}>
-          New
-        </button>
-
-        <button className="primary-btn" onClick={onSave}>
-          Save
-        </button>
-      </div>
-    </nav>
-  );
+export default function Navbar({ activeTab, setActiveTab, onNew, onSave }: NavbarProps) {
+  return <nav className="navbar">
+    <button className="brand" onClick={() => setActiveTab("write")} aria-label="FlowSense home">
+      <span className="brand-mark"><BookOpen size={16} strokeWidth={1.8} /></span><span>FlowSense</span>
+    </button>
+    <div className="navbar-center">
+      {tabs.map((tab) => <button key={tab} className={`nav-link ${activeTab === tab ? "active" : ""}`} onClick={() => setActiveTab(tab)}>
+        {tab.charAt(0).toUpperCase() + tab.slice(1)}
+      </button>)}
+    </div>
+    <div className="navbar-right">
+      <button className="nav-new" onClick={onNew}><FilePlus2 size={15} /><span>New</span></button>
+      <button className="nav-save" onClick={onSave}><Save size={14} /><span>Save draft</span></button>
+    </div>
+  </nav>;
 }
