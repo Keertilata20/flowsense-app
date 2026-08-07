@@ -1,16 +1,16 @@
 import type { ChangeEvent, RefObject } from "react";
-import { Check, X } from "lucide-react";
+import { Check, Maximize2, Minimize2, Star, X } from "lucide-react";
 import EditorStatus from "./EditorStatus";
 import WriteToolbar from "./WriteToolbar";
 
 type WriteScreenProps = {
-  text: string; textareaRef: RefObject<HTMLTextAreaElement | null>; wordCount: number; charCount: number; readingMinutes: number; loading: boolean; suggestion: string; status: string; autoHelp: boolean;
-  onChange: (event: ChangeEvent<HTMLTextAreaElement>) => void; onImprove: () => void; onSave: () => void; onSuggestionsChange: (enabled: boolean) => void; onDismissSuggestion: () => void; onUseSuggestion: () => void; onExportPDF: () => void; onExportDOCX: () => void; onExportTXT: () => void;
+  text: string; title: string; spaceLabel: string; favorite: boolean; focusMode: boolean; textareaRef: RefObject<HTMLTextAreaElement | null>; wordCount: number; charCount: number; readingMinutes: number; loading: boolean; suggestion: string; status: string; autoHelp: boolean;
+  onChange: (event: ChangeEvent<HTMLTextAreaElement>) => void; onTitleChange: (title: string) => void; onToggleFavorite: () => void; onToggleFocus: () => void; onImprove: () => void; onSave: () => void; onSuggestionsChange: (enabled: boolean) => void; onDismissSuggestion: () => void; onUseSuggestion: () => void; onExportPDF: () => void; onExportDOCX: () => void; onExportTXT: () => void;
 };
 
-export default function WriteScreen({ text, textareaRef, wordCount, charCount, readingMinutes, loading, suggestion, status, autoHelp, onChange, onImprove, onSave, onSuggestionsChange, onDismissSuggestion, onUseSuggestion, onExportPDF, onExportDOCX, onExportTXT }: WriteScreenProps) {
+export default function WriteScreen({ text, title, spaceLabel, favorite, focusMode, textareaRef, wordCount, charCount, readingMinutes, loading, suggestion, status, autoHelp, onChange, onTitleChange, onToggleFavorite, onToggleFocus, onImprove, onSave, onSuggestionsChange, onDismissSuggestion, onUseSuggestion, onExportPDF, onExportDOCX, onExportTXT }: WriteScreenProps) {
   return <main className="mx-auto w-full max-w-[1100px] px-6 pb-20 pt-9 sm:px-10 sm:pt-14">
-    <header className="mb-7 sm:mb-9"><p className="font-['Instrument_Serif',Georgia,serif] text-[1.75rem] leading-tight tracking-[-0.025em] text-[#4b3c33] sm:text-[2rem]">Good evening. What would you like to write today?</p></header>
+    <header className="mb-7 flex items-start gap-3 sm:mb-9"><div className="min-w-0 flex-1"><input value={title} onChange={(event) => onTitleChange(event.target.value)} placeholder="Untitled note" className="w-full bg-transparent font-['Instrument_Serif',Georgia,serif] text-3xl tracking-[-.035em] text-[#44362e] outline-none placeholder:text-[#b7a99e] sm:text-4xl" aria-label="Document title" /><p className="mt-2 text-xs text-[#95857a]">{spaceLabel} <span className="px-1 text-[#c9b9ad]">•</span> {status || "Saved locally"}</p></div><button onClick={onToggleFavorite} className={`rounded-md p-2 ${favorite ? "text-[#b17345]" : "text-[#b9aaa0] hover:bg-[#f6ece3]"}`} aria-label={favorite ? "Unfavorite document" : "Favorite document"}><Star size={17} fill={favorite ? "currentColor" : "none"} /></button><button onClick={onToggleFocus} className="rounded-md p-2 text-[#9c8d82] hover:bg-[#f6ece3]" aria-label={focusMode ? "Exit focus mode" : "Enter focus mode"}>{focusMode ? <Minimize2 size={17} /> : <Maximize2 size={17} />}</button></header>
     <section className="overflow-hidden rounded-[14px] border border-[#e9dfd5] bg-[#fffdf9] transition-colors duration-150 focus-within:border-[#cdb7a5] focus-within:ring-2 focus-within:ring-[#d8c3b2]/35">
       <textarea ref={textareaRef} value={text} onChange={onChange} placeholder="Begin with a thought…" className="editor-textarea block min-h-[520px] w-full resize-none border-0 bg-transparent px-7 py-9 font-['Instrument_Serif',Georgia,serif] text-[1.38rem] leading-[1.82] tracking-[-0.008em] text-[#352b25] outline-none placeholder:text-[#b8aca1] sm:px-14 sm:py-12 sm:text-[1.58rem]" aria-label="Writing editor" />
       {loading && <div className="mx-7 mb-6 border-l-2 border-[#bd927a] bg-[#fcf5ee] px-4 py-3 text-sm text-[#785d4d] sm:mx-14">Refining your writing…</div>}

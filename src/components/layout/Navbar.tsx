@@ -1,9 +1,9 @@
 import { BookOpen, FilePlus2, Save } from "lucide-react";
 import "./Navbar.css";
 
-type Tab = "write" | "history" | "insights";
+type Tab = "home" | "write" | "history" | "insights";
 type NavbarProps = { activeTab: Tab; setActiveTab: (tab: Tab) => void; onNew: () => void; onSave: () => void };
-const tabs: Tab[] = ["write", "history", "insights"];
+const tabs: Tab[] = ["home", "write", "history", "insights"];
 
 export default function Navbar({ activeTab, setActiveTab, onNew, onSave }: NavbarProps) {
   return <nav className="navbar">
