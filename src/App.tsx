@@ -35,10 +35,11 @@ function App() {
   const [showSpaceCreator, setShowSpaceCreator] = useState(false);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const debounceRef = useRef<number | null>(null);
+  const autosaveRef = useRef<number | null>(null);
   const lastAutoText = useRef("");
 
   useEffect(() => { localStorage.setItem("flowsense-draft", text); }, [text]);
-  useEffect(() => () => { if (debounceRef.current) window.clearTimeout(debounceRef.current); }, []);
+  useEffect(() => () => { if (debounceRef.current) window.clearTimeout(debounceRef.current); if (autosaveRef.current) window.clearTimeout(autosaveRef.current); }, []);
 
   const wordCount = text.trim() ? text.trim().split(/\s+/).length : 0;
   const charCount = text.length;
@@ -60,7 +61,7 @@ function App() {
   const handleChange = (event: React.ChangeEvent<HTMLTextAreaElement>) => {
     const nextText = event.target.value;
     setText(nextText); setSuggestion(""); setNotice("");
-    if (activeDocumentId) { const current = documents.find((document) => document.id === activeDocumentId); updateDocument(activeDocumentId, { content: nextText, title: current?.title === "Untitled note" ? getDocumentTitle({ content: nextText, title: "" }) : current?.title, updatedAt: Date.now(), wordCount: getWordCount(nextText), readingTime: getReadingMinutes(nextText) }); }
+    if (activeDocumentId) { const current = documents.find((document) => document.id === activeDocumentId); updateDocument(activeDocumentId, { content: nextText, title: current?.title === "Untitled note" ? getDocumentTitle({ content: nextText, title: "" }) : current?.title, updatedAt: Date.now(), wordCount: getWordCount(nextText), readingTime: getReadingMinutes(nextText) }); setNotice("Saving…"); if (autosaveRef.current) window.clearTimeout(autosaveRef.current); autosaveRef.current = window.setTimeout(() => setNotice("Saved just now"), 650); }
     event.target.style.height = "auto";
     event.target.style.height = `${Math.max(event.target.scrollHeight, 440)}px`;
     if (!autoHelp || nextText.trim().length < 40) return;
@@ -88,7 +89,7 @@ function App() {
   return <div className="app">
     {!focusMode && <Navbar activeTab={tab} setActiveTab={setTab} onNew={handleNew} onSave={saveDraft} />}
     {tab === "home" && <Home documents={documents} spaces={spaces} onNew={() => handleNew()} onOpenLibrary={() => setTab("history")} onOpen={(document) => { setText(getContent(document)); setDraftTitle(document.title); setActiveDocumentId(document.id); setActiveSpace(document.space); setTab("write"); setNotice("Document opened."); }} />}
-    {tab === "write" && <WriteScreen text={text} title={draftTitle || "Untitled note"} spaceLabel={spaces.find((space) => space.id === activeSpace)?.label ?? "Personal"} favorite={Boolean(documents.find((document) => document.id === activeDocumentId)?.favorite)} focusMode={focusMode} textareaRef={textareaRef} wordCount={wordCount} charCount={charCount} readingMinutes={readingMinutes} loading={loading !== null} suggestion={suggestion} status={notice} autoHelp={autoHelp} onChange={handleChange} onTitleChange={(title) => { setDraftTitle(title); if (activeDocumentId) updateDocument(activeDocumentId, { title }); }} onToggleFavorite={() => { if (activeDocumentId) toggleFavorite(activeDocumentId); }} onToggleFocus={() => setFocusMode((value) => !value)} onImprove={() => requestSuggestion("improve")} onSave={saveDraft} onSuggestionsChange={setAutoHelp} onDismissSuggestion={() => setSuggestion("")} onUseSuggestion={() => { setText(suggestion); setSuggestion(""); setNotice("Refinement applied."); }} onExportPDF={downloadPDF} onExportDOCX={downloadDOCX} onExportTXT={downloadTXT} />}
+    {tab === "write" && <WriteScreen text={text} title={draftTitle || "Untitled note"} spaceLabel={spaces.find((space) => space.id === activeSpace)?.label ?? "Personal"} favorite={Boolean(documents.find((document) => document.id === activeDocumentId)?.favorite)} focusMode={focusMode} textareaRef={textareaRef} wordCount={wordCount} charCount={charCount} readingMinutes={readingMinutes} loading={loading !== null} suggestion={suggestion} status={notice} autoHelp={autoHelp} onChange={handleChange} onKeyDown={(event) => { if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === "s") { event.preventDefault(); saveDraft(); } if ((event.metaKey || event.ctrlKey) && event.shiftKey && event.key.toLowerCase() === "f") { event.preventDefault(); setFocusMode((value) => !value); } }} onTitleChange={(title) => { setDraftTitle(title); if (activeDocumentId) updateDocument(activeDocumentId, { title }); }} onToggleFavorite={() => { if (activeDocumentId) toggleFavorite(activeDocumentId); }} onToggleFocus={() => setFocusMode((value) => !value)} onImprove={() => requestSuggestion("improve")} onSave={saveDraft} onSuggestionsChange={setAutoHelp} onDismissSuggestion={() => setSuggestion("")} onUseSuggestion={() => { setText(suggestion); setSuggestion(""); setNotice("Refinement applied."); }} onExportPDF={downloadPDF} onExportDOCX={downloadDOCX} onExportTXT={downloadTXT} />}
     {tab === "history" && <Library documents={documents} spaces={spaces} onOpen={(document: FlowDocument) => { setText(getContent(document)); setDraftTitle(document.title); setActiveDocumentId(document.id); setActiveSpace(document.space); setTab("write"); setNotice("Document opened."); }} onRename={renameDraft} onDelete={deleteDocument} onFavorite={toggleFavorite} onMove={moveDocument} onStartWriting={handleNew} onCreateSpace={() => setShowSpaceCreator(true)} onSpaceChange={setActiveSpace} />}
     {tab === "insights" && <InsightsDashboard documents={documents} spaces={spaces} />}
     {showSpacePicker && <SpacePicker spaces={spaces} onSelect={openNewDocument} onClose={() => setShowSpacePicker(false)} />}
