@@ -16,7 +16,7 @@ export default function Navbar({ activeTab, setActiveTab, onNew, onSave }: Navba
       </button>)}
     </div>
     <div className="navbar-right">
-      <button className="nav-new" onClick={onNew}><FilePlus2 size={15} /><span>New</span></button>
+      {activeTab !== "home" && <button className="nav-new" onClick={onNew}><FilePlus2 size={15} /><span>New</span></button>}
       {activeTab === "write" && <button className="nav-save" onClick={onSave}><Save size={14} /><span>Save &amp; New</span></button>}
     </div>
   </nav>;
