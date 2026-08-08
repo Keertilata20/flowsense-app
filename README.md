@@ -203,4 +203,4 @@ This project is currently an internal product prototype. Add a project-specific 
 
 ---
 
-Built with ❤️ by Keerti • Internal prototype — add a license before external distribution.
+Built with ❤️ by Keerti • Internal prototype.
