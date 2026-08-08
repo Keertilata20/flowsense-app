@@ -1,12 +1,24 @@
 # FlowSense
 
-FlowSense is a calm, document-first writing workspace for university students. It brings long-form writing, personal organization, and lightweight writing support into one warm, focused environment.
+<p align="left">
+  <img alt="React" src="https://img.shields.io/badge/React-19-61DAFB?logo=react&logoColor=white" />
+  <img alt="TypeScript" src="https://img.shields.io/badge/TypeScript-4.9-3178C6?logo=typescript&logoColor=white" />
+  <img alt="Vite" src="https://img.shields.io/badge/Vite-⚡-7C3AED?logo=vite&logoColor=white" />
+  <img alt="Tailwind CSS" src="https://img.shields.io/badge/Tailwind_CSS-3.0-06B6D4?logo=tailwindcss&logoColor=white" />
+  <img alt="Express" src="https://img.shields.io/badge/Express-Local-000000?logo=express&logoColor=white" />
+  <img alt="jsPDF" src="https://img.shields.io/badge/jsPDF-2.5-FFDD00?logo=javascript&logoColor=black" />
+  <img alt="docx" src="https://img.shields.io/badge/docx-1.0-0078D7?logo=word&logoColor=white" />
+  <img alt="FileSaver" src="https://img.shields.io/badge/FileSaver-2.0-FF6C37?logo=github&logoColor=white" />
+  <img alt="License" src="https://img.shields.io/badge/License-Internal-orange" />
+</p>
+
+FlowSense is a calm, document-first writing workspace for university students. It brings long-form writing, personal organization, and lightweight writing support into one warm, focused environment[...]
 
 > Write first. Organize naturally. Improve thoughtfully.
 
 ## Product overview
 
-FlowSense is designed to feel closer to a professional writing tool than a notes inbox. Documents can be written on paginated A4-style paper, organized into Spaces, tagged, searched, revisited, and exported without leaving the workspace.
+FlowSense is designed to feel closer to a professional writing tool than a notes inbox. Documents can be written on paginated A4-style paper, organized into Spaces, tagged, searched, revisited, and[...]
 
 The application is local-first: drafts, Spaces, metadata, and preferences are stored in the browser so the core writing flow remains fast and available without an account or cloud setup.
 
@@ -73,7 +85,7 @@ src/
 └── App.tsx
 ```
 
-The document model is normalized in `src/components/library/types.ts`. Legacy records using `text` and `savedAt` are migrated into the current `content`, metadata, Space, status, and tag fields when loaded.
+The document model is normalized in `src/components/library/types.ts`. Legacy records using `text` and `savedAt` are migrated into the current `content`, metadata, Space, status, and tag fields wh[...]
 
 ## Tech stack
 
@@ -140,7 +152,7 @@ FlowSense follows a small set of product principles:
 
 ## Roadmap
 
-Planned work includes richer tag management, more advanced document relationships, improved writing analytics, and future intelligent assistance. These features should build on the existing normalized document model rather than changing the core editor experience.
+Planned work includes richer tag management, more advanced document relationships, improved writing analytics, and future intelligent assistance. These features should build on the existing norma[...]
 
 ## License
 
