@@ -16,7 +16,7 @@ export function useDocuments() {
   const update = useCallback((updater: (current: FlowDocument[]) => FlowDocument[]) => setDocuments(updater), []);
   const createDocument = useCallback((content: string, space: string) => {
     const now = Date.now();
-    const document = normalizeDocument({ id: crypto.randomUUID(), title: "", content, space, createdAt: now, updatedAt: now, wordCount: getWordCount(content), readingTime: getReadingMinutes(content), favorite: false });
+    const document = normalizeDocument({ id: crypto.randomUUID(), title: "", content, space, createdAt: now, updatedAt: now, wordCount: getWordCount(content), readingTime: getReadingMinutes(content), favorite: false, status: "draft" });
     setDocuments((current) => [document, ...current].slice(0, 50));
     return document;
   }, []);

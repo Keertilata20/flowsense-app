@@ -1,0 +1,6 @@
+@media print {
+  .navbar, .hero, .action-buttons, .editor-footer { display: none !important; }
+  .app { background: #fff; }
+  .page-editor-shell { max-height: none; overflow: visible; padding: 0; }
+  .a4-page { min-height: 100vh !important; max-width: none !important; box-shadow: none !important; break-after: page; page-break-after: always; }
+}
