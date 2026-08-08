@@ -1,6 +1,6 @@
-import { BookOpen, BriefcaseBusiness, Folder, Rocket, Sprout } from "lucide-react";
+import { BookOpen, BriefcaseBusiness, Folder, Inbox, Rocket, Sprout } from "lucide-react";
 
-const icons = { rocket: Rocket, briefcase: BriefcaseBusiness, book: BookOpen, sprout: Sprout, folder: Folder } as const;
+const icons = { rocket: Rocket, briefcase: BriefcaseBusiness, book: BookOpen, sprout: Sprout, folder: Folder, inbox: Inbox } as const;
 type SpaceIconProps = { icon: string; size?: number };
 
 export default function SpaceIcon({ icon, size = 14 }: SpaceIconProps) {

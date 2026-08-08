@@ -5,6 +5,7 @@ export const DEFAULT_SPACES = [
   { id: "personal", label: "Personal", icon: "sprout" },
 ] as const;
 export type SpaceDefinition = { id: string; label: string; icon: string; custom?: boolean };
+export const UNASSIGNED_SPACE: SpaceDefinition = { id: "none", label: "No space yet", icon: "inbox" };
 export type Space = (typeof DEFAULT_SPACES)[number]["id"];
 
 export function getDefaultSpaces(): SpaceDefinition[] { return DEFAULT_SPACES.map((space) => ({ ...space })); }
