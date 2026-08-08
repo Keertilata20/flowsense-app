@@ -12,15 +12,39 @@
   <img alt="License" src="https://img.shields.io/badge/License-Internal-orange" />
 </p>
 
-FlowSense is a calm, document-first writing workspace for university students. It brings long-form writing, personal organization, and lightweight writing support into one warm, focused environment[...]
+**Quick links:** [Issues](https://github.com/Keertilata20/flowsense-app/issues) • [Pull requests](https://github.com/Keertilata20/flowsense-app/pulls) • [Actions](https://github.com/Keertilata20/flowsense-app/actions) • [Releases](https://github.com/Keertilata20/flowsense-app/releases)
+
+FlowSense is a calm, document-first writing workspace for university students. It brings long-form writing, personal organization, and lightweight writing support into one warm, focused environment.
 
 > Write first. Organize naturally. Improve thoughtfully.
 
+## Table of contents
+
+- [Product overview](#product-overview)
+- [Core features](#core-features)
+- [Current capabilities](#current-capabilities)
+- [Project structure](#project-structure)
+- [Tech stack](#tech-stack)
+- [Getting started](#getting-started)
+- [Design principles](#design-principles)
+- [Roadmap](#roadmap)
+- [Contributing](#contributing)
+- [License](#license)
+
 ## Product overview
 
-FlowSense is designed to feel closer to a professional writing tool than a notes inbox. Documents can be written on paginated A4-style paper, organized into Spaces, tagged, searched, revisited, and[...]
+FlowSense is designed to feel closer to a professional writing tool than a notes inbox. Documents can be written on paginated A4-style paper, organized into Spaces, tagged, searched, revisited, and exported.
 
 The application is local-first: drafts, Spaces, metadata, and preferences are stored in the browser so the core writing flow remains fast and available without an account or cloud setup.
+
+## Core features
+
+- ✍️  Focused, paginated A4 writing canvas built for long-form documents
+- 🗂️  Lightweight organization with Spaces, tags, and quick moving/duplication
+- 🔎  Fast, instant search across titles, content, tags, and Spaces
+- 📄  Export to PDF, Word, and plain text with clear multi-page output
+- 🧭  Simple insights: today’s words, most active Space, and document stats
+- ⚡  Local-first autosave and optional local writing suggestions (no account required)
 
 ## Current capabilities
 
@@ -85,7 +109,7 @@ src/
 └── App.tsx
 ```
 
-The document model is normalized in `src/components/library/types.ts`. Legacy records using `text` and `savedAt` are migrated into the current `content`, metadata, Space, status, and tag fields wh[...]
+The document model is normalized in `src/components/library/types.ts`. Legacy records using `text` and `savedAt` are migrated into the current `content`, metadata, Space, status, and tag fields when loaded.
 
 ## Tech stack
 
@@ -152,8 +176,31 @@ FlowSense follows a small set of product principles:
 
 ## Roadmap
 
-Planned work includes richer tag management, more advanced document relationships, improved writing analytics, and future intelligent assistance. These features should build on the existing norma[...]
+Planned work includes richer tag management, more advanced document relationships, improved writing analytics, and future intelligent assistance. These features should build on the existing normalized model.
+
+## Contributing
+
+Thanks for taking an interest in FlowSense — contributions are welcome. A short guideline to get started:
+
+1. Fork the repository and create a feature branch: `git checkout -b feat/your-feature`
+2. Install dependencies: `npm install`
+3. Run the app locally: `npm run dev`
+4. Make changes, add tests where appropriate, and keep commits small and focused
+5. Open a pull request with a clear title and description referencing any related issues
+
+Please follow these basics when opening a PR:
+
+- Write a short summary of the change and why it’s needed
+- Link to any related issue(s)
+- Include screenshots or recordings for UI changes
+- Ensure linting passes: `npm run lint`
+
+If you want to propose a larger design or API change, open an issue first to discuss.
 
 ## License
 
 This project is currently an internal product prototype. Add a project-specific license before external distribution.
+
+---
+
+Built with ❤️ by Keerti • Internal prototype — add a license before external distribution.
