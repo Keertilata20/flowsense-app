@@ -22,6 +22,7 @@ export type FlowDocument = {
   readingTime: number;
   favorite: boolean;
   status: "draft" | "in-progress" | "finished" | "archived";
+  tags: string[];
   /** Legacy fields are accepted while older localStorage entries migrate. */
   text?: string;
   savedAt?: string;
@@ -48,6 +49,6 @@ export function normalizeDocument(raw: Partial<FlowDocument> & { text?: string; 
   return {
     id: raw.id ?? crypto.randomUUID(), title: raw.title?.trim() || getDocumentTitle({ content, title: "" }), content,
     space: legacySpaces[raw.space ?? ""] ?? raw.space ?? "personal", createdAt: raw.createdAt ?? fallbackTime, updatedAt: raw.updatedAt ?? fallbackTime,
-    wordCount: raw.wordCount ?? getWordCount(content), readingTime: raw.readingTime ?? getReadingMinutes(content), favorite: raw.favorite ?? false, status: raw.status ?? "draft",
+    wordCount: raw.wordCount ?? getWordCount(content), readingTime: raw.readingTime ?? getReadingMinutes(content), favorite: raw.favorite ?? false, status: raw.status ?? "draft", tags: raw.tags ?? [],
   };
 }

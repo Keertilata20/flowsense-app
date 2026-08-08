@@ -25,7 +25,7 @@ function App() {
   const [loading, setLoading] = useState<Mode | null>(null);
   const [autoHelp, setAutoHelp] = useState(true);
   const [notice, setNotice] = useState("");
-  const { documents, createDocument, updateDocument, deleteDocument } = useDocuments();
+  const { documents, createDocument, updateDocument, deleteDocument, duplicateDocument } = useDocuments();
   const { spaces, createSpace } = useSpaces();
   const [activeDocumentId, setActiveDocumentId] = useState<string | null>(null);
   const [draftTitle, setDraftTitle] = useState("");
@@ -82,13 +82,15 @@ function App() {
   const renameDraft = (id: string, title: string) => updateDocument(id, { title });
   const toggleFavorite = (id: string) => { const document = documents.find((item) => item.id === id); if (document) updateDocument(id, { favorite: !document.favorite }); };
   const moveDocument = (id: string, space: string) => updateDocument(id, { space, updatedAt: Date.now() });
+  const bulkDelete = (ids: string[]) => ids.forEach((id) => deleteDocument(id));
+  const bulkMove = (ids: string[], space: string) => ids.forEach((id) => moveDocument(id, space));
   const handleCreateSpace = (label: string) => { const space = createSpace(label); if (space) setActiveSpace(space.id); setShowSpaceCreator(false); };
 
   return <div className="app">
     {!focusMode && <Navbar activeTab={tab} setActiveTab={setTab} onNew={handleNew} onSave={saveAndNew} />}
     {tab === "home" && <Home documents={documents} spaces={spaces} onNew={() => handleNew()} onOpenLibrary={() => setTab("history")} onOpen={(document) => { setText(getContent(document)); setDraftTitle(document.title); setActiveDocumentId(document.id); setActiveSpace(document.space); setTab("write"); setNotice("Document opened."); }} />}
     {tab === "write" && <WriteScreen text={text} title={draftTitle} spaceLabel={spaces.find((space) => space.id === activeSpace)?.label ?? (activeSpace === "none" ? UNASSIGNED_SPACE.label : "Personal")} statusValue={documents.find((document) => document.id === activeDocumentId)?.status ?? "draft"} favorite={Boolean(documents.find((document) => document.id === activeDocumentId)?.favorite)} focusMode={focusMode} textareaRef={textareaRef} wordCount={wordCount} charCount={charCount} readingMinutes={readingMinutes} loading={loading !== null} suggestion={suggestion} status={notice} autoHelp={autoHelp} onTextChange={handleTextChange} onKeyDown={(event) => { if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === "s") { event.preventDefault(); saveDraft(); } if ((event.metaKey || event.ctrlKey) && event.shiftKey && event.key.toLowerCase() === "f") { event.preventDefault(); setFocusMode((value) => !value); } }} onTitleChange={(title) => { setDraftTitle(title); if (activeDocumentId) updateDocument(activeDocumentId, { title }); }} onStatusChange={(status) => { if (activeDocumentId) updateDocument(activeDocumentId, { status }); }} onToggleFavorite={() => { if (activeDocumentId) toggleFavorite(activeDocumentId); }} onToggleFocus={() => setFocusMode((value) => !value)} onImprove={() => requestSuggestion("improve")} onSave={saveDraft} onSuggestionsChange={setAutoHelp} onDismissSuggestion={() => setSuggestion("")} onUseSuggestion={() => { setText(suggestion); setSuggestion(""); setNotice("Refinement applied."); }} onExportPDF={downloadPDF} onExportDOCX={downloadDOCX} onExportTXT={downloadTXT} />}
-    {tab === "history" && <Library documents={documents} spaces={spaces} onOpen={(document: FlowDocument) => { setText(getContent(document)); setDraftTitle(document.title); setActiveDocumentId(document.id); setActiveSpace(document.space); setTab("write"); setNotice("Document opened."); }} onRename={renameDraft} onDelete={deleteDocument} onFavorite={toggleFavorite} onMove={moveDocument} onStartWriting={handleNew} onCreateSpace={() => setShowSpaceCreator(true)} onSpaceChange={setActiveSpace} />}
+    {tab === "history" && <Library documents={documents} spaces={spaces} onOpen={(document: FlowDocument) => { setText(getContent(document)); setDraftTitle(document.title); setActiveDocumentId(document.id); setActiveSpace(document.space); setTab("write"); setNotice("Document opened."); }} onRename={renameDraft} onDelete={deleteDocument} onFavorite={toggleFavorite} onMove={moveDocument} onDuplicate={(id) => duplicateDocument(id)} onBulkDelete={bulkDelete} onBulkMove={bulkMove} onStartWriting={handleNew} onCreateSpace={() => setShowSpaceCreator(true)} onSpaceChange={setActiveSpace} />}
     {tab === "insights" && <InsightsDashboard documents={documents} spaces={spaces} />}
     {showSpacePicker && <SpacePicker spaces={spaces} onSelect={openNewDocument} onClose={() => setShowSpacePicker(false)} />}
     {showSpaceCreator && <SpaceCreator onCreate={handleCreateSpace} onClose={() => setShowSpaceCreator(false)} />}

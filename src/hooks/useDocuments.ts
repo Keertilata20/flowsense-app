@@ -22,5 +22,6 @@ export function useDocuments() {
   }, []);
   const updateDocument = useCallback((id: string, patch: Partial<FlowDocument>) => update((current) => current.map((document) => document.id === id ? normalizeDocument({ ...document, ...patch }) : document)), [update]);
   const deleteDocument = useCallback((id: string) => update((current) => current.filter((document) => document.id !== id)), [update]);
-  return { documents, createDocument, updateDocument, deleteDocument };
+  const duplicateDocument = useCallback((id: string) => { let copy: FlowDocument | undefined; setDocuments((current) => { const source = current.find((document) => document.id === id); if (!source) return current; const now = Date.now(); copy = { ...source, id: crypto.randomUUID(), title: `${source.title} copy`, createdAt: now, updatedAt: now, favorite: false }; return [copy, ...current].slice(0, 50); }); return copy; }, []);
+  return { documents, createDocument, updateDocument, deleteDocument, duplicateDocument };
 }
