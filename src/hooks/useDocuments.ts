@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from "react";
-import { getReadingMinutes, getWordCount, normalizeDocument, type FlowDocument } from "../components/library/types";
+import { getReadingMinutes, getWordCount, normalizeDocument, type FlowDocument, type WritingMode } from "../components/library/types";
 
 const STORAGE_KEY = "flowsense-history";
 
@@ -14,9 +14,9 @@ export function useDocuments() {
   const [documents, setDocuments] = useState<FlowDocument[]>(readDocuments);
   useEffect(() => { localStorage.setItem(STORAGE_KEY, JSON.stringify(documents)); }, [documents]);
   const update = useCallback((updater: (current: FlowDocument[]) => FlowDocument[]) => setDocuments(updater), []);
-  const createDocument = useCallback((content: string, space: string) => {
+  const createDocument = useCallback((content: string, space: string, mode: WritingMode = "note") => {
     const now = Date.now();
-    const document = normalizeDocument({ id: crypto.randomUUID(), title: "", content, space, createdAt: now, updatedAt: now, wordCount: getWordCount(content), readingTime: getReadingMinutes(content), favorite: false, status: "draft" });
+    const document = normalizeDocument({ id: crypto.randomUUID(), title: "", content, space, mode, createdAt: now, updatedAt: now, wordCount: getWordCount(content), readingTime: getReadingMinutes(content), favorite: false, status: "draft" });
     setDocuments((current) => [document, ...current].slice(0, 50));
     return document;
   }, []);

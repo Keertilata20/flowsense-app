@@ -10,6 +10,12 @@ export type Space = (typeof DEFAULT_SPACES)[number]["id"];
 
 export function getDefaultSpaces(): SpaceDefinition[] { return DEFAULT_SPACES.map((space) => ({ ...space })); }
 export type SortOption = "recent" | "oldest" | "alphabetical" | "words";
+export type WritingMode = "note" | "journal" | "document";
+export const WRITING_MODES: { id: WritingMode; label: string; description: string }[] = [
+  { id: "note", label: "Note", description: "A light, flowing page for quick thoughts." },
+  { id: "journal", label: "Journal", description: "A spacious canvas for personal writing." },
+  { id: "document", label: "Document", description: "A4 pages with margins and page numbers." },
+];
 
 export type FlowDocument = {
   id: string;
@@ -23,23 +29,25 @@ export type FlowDocument = {
   favorite: boolean;
   status: "draft" | "in-progress" | "finished" | "archived";
   tags: string[];
+  mode: WritingMode;
   /** Legacy fields are accepted while older localStorage entries migrate. */
   text?: string;
   savedAt?: string;
 };
 
 export function getContent(document: Pick<FlowDocument, "content" | "text">) { return document.content ?? document.text ?? ""; }
-export function getWordCount(text: string) { return text.trim() ? text.trim().split(/\s+/).length : 0; }
+export function getPlainText(text: string) { return text.replace(/<[^>]*>/g, " ").replace(/&nbsp;/g, " ").replace(/&amp;/g, "&").replace(/\s+/g, " ").trim(); }
+export function getWordCount(text: string) { const plain = getPlainText(text); return plain ? plain.split(/\s+/).length : 0; }
 export function getReadingMinutes(text: string) { return Math.max(1, Math.ceil(getWordCount(text) / 200)); }
 export function getDocumentTitle(document: Pick<FlowDocument, "content" | "text" | "title">) {
   if (document.title?.trim()) return document.title.trim();
-  const cleanText = getContent(document).replace(/\s+/g, " ").trim();
+  const cleanText = getPlainText(getContent(document));
   const firstSentence = cleanText.match(/^(.+?[.!?])(?:\s|$)/)?.[1];
   if (firstSentence && firstSentence.split(/\s+/).length <= 12) return firstSentence;
   const words = cleanText.split(/\s+/).filter(Boolean).slice(0, 7);
   return words.length ? `${words.join(" ")}${cleanText.split(/\s+/).length > 7 ? "…" : ""}` : "Untitled note";
 }
-export function getPreview(text: string) { return text.replace(/\s+/g, " ").trim().slice(0, 165) || "An empty page"; }
+export function getPreview(text: string) { return getPlainText(text).slice(0, 165) || "An empty page"; }
 export function getEditedTimestamp(document: FlowDocument) { return document.updatedAt || Date.parse(document.savedAt ?? "") || 0; }
 
 export function normalizeDocument(raw: Partial<FlowDocument> & { text?: string; savedAt?: string }): FlowDocument {
@@ -49,6 +57,6 @@ export function normalizeDocument(raw: Partial<FlowDocument> & { text?: string; 
   return {
     id: raw.id ?? crypto.randomUUID(), title: raw.title?.trim() || getDocumentTitle({ content, title: "" }), content,
     space: legacySpaces[raw.space ?? ""] ?? raw.space ?? "personal", createdAt: raw.createdAt ?? fallbackTime, updatedAt: raw.updatedAt ?? fallbackTime,
-    wordCount: raw.wordCount ?? getWordCount(content), readingTime: raw.readingTime ?? getReadingMinutes(content), favorite: raw.favorite ?? false, status: raw.status ?? "draft", tags: raw.tags ?? [],
+    wordCount: raw.wordCount ?? getWordCount(content), readingTime: raw.readingTime ?? getReadingMinutes(content), favorite: raw.favorite ?? false, status: raw.status ?? "draft", tags: raw.tags ?? [], mode: raw.mode ?? "document",
   };
 }

@@ -50,9 +50,12 @@ The application is local-first: drafts, Spaces, metadata, and preferences are st
 
 ### Writing workspace
 
-- A4-inspired paginated writing canvas with fixed margins and page numbers
+FlowSense now supports three writing modes: flowing Notes for quick capture, spacious Journals for personal entries, and paginated A4 Documents for print-oriented work. Existing saved documents keep Document mode for backward-compatible layout.
+
+- A4-inspired paginated writing canvas with fixed margins and page numbers for Document mode
+- Flowing editor canvases for Note and Journal mode
 - Long-form typography with a warm paper palette
-- Editable document title, Space, status, and tags
+- Editable document title, Space, writing mode, status, and tags
 - Statuses for Draft, In Progress, Finished, and Archived
 - Favorite documents and Focus Mode
 - Autosave feedback with `Saving...` and `Saved just now` states
