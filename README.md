@@ -12,7 +12,7 @@
   <img alt="License" src="https://img.shields.io/badge/License-Internal-orange" />
 </p>
 
-**Quick links:** [Issues](https://github.com/Keertilata20/flowsense-app/issues) • [Pull requests](https://github.com/Keertilata20/flowsense-app/pulls) • [Actions](https://github.com/Keertilata20/flowsense-app/actions) • [Releases](https://github.com/Keertilata20/flowsense-app/releases)
+
 
 FlowSense is a calm, document-first writing workspace for university students. It brings long-form writing, personal organization, and lightweight writing support into one warm, focused environment.
 
