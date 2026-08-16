@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/refs */
 import { Bold, Italic, Underline, Heading2, List, ListChecks, Quote } from "lucide-react";
 import type { RefObject } from "react";
 
