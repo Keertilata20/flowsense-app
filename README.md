@@ -12,24 +12,11 @@
   <img alt="License" src="https://img.shields.io/badge/License-Internal-orange" />
 </p>
 
-**Quick links:** [Issues](https://github.com/Keertilata20/flowsense-app/issues) • [Pull requests](https://github.com/Keertilata20/flowsense-app/pulls) • [Actions](https://github.com/Keertilata20/flowsense-app/actions) • [Releases](https://github.com/Keertilata20/flowsense-app/releases)
+
 
 FlowSense is a calm, document-first writing workspace for university students. It brings long-form writing, personal organization, and lightweight writing support into one warm, focused environment.
 
 > Write first. Organize naturally. Improve thoughtfully.
-
-## Table of contents
-
-- [Product overview](#product-overview)
-- [Core features](#core-features)
-- [Current capabilities](#current-capabilities)
-- [Project structure](#project-structure)
-- [Tech stack](#tech-stack)
-- [Getting started](#getting-started)
-- [Design principles](#design-principles)
-- [Roadmap](#roadmap)
-- [Contributing](#contributing)
-- [License](#license)
 
 ## Product overview
 
