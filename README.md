@@ -18,19 +18,6 @@ FlowSense is a calm, document-first writing workspace for university students. I
 
 > Write first. Organize naturally. Improve thoughtfully.
 
-## Table of contents
-
-- [Product overview](#product-overview)
-- [Core features](#core-features)
-- [Current capabilities](#current-capabilities)
-- [Project structure](#project-structure)
-- [Tech stack](#tech-stack)
-- [Getting started](#getting-started)
-- [Design principles](#design-principles)
-- [Roadmap](#roadmap)
-- [Contributing](#contributing)
-- [License](#license)
-
 ## Product overview
 
 FlowSense is designed to feel closer to a professional writing tool than a notes inbox. Documents can be written on paginated A4-style paper, organized into Spaces, tagged, searched, revisited, and exported.
