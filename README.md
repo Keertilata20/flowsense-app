@@ -1,4 +1,4 @@
-# FlowSense
+# Threadloom
 
 <p align="left">
   <img alt="React" src="https://img.shields.io/badge/React-19-61DAFB?logo=react&logoColor=white" />
@@ -14,13 +14,13 @@
 
 
 
-FlowSense is a calm, document-first writing workspace for university students. It brings long-form writing, personal organization, and lightweight writing support into one warm, focused environment.
+Threadloom is a calm, document-first writing workspace for students, researchers, creators, and thoughtful knowledge workers. It brings long-form writing, personal organization, and lightweight writing support into one warm, focused environment.
 
 > Write first. Organize naturally. Improve thoughtfully.
 
 ## Product overview
 
-FlowSense is designed to feel closer to a professional writing tool than a notes inbox. Documents can be written on paginated A4-style paper, organized into Spaces, tagged, searched, revisited, and exported.
+Threadloom is designed to feel closer to a professional writing tool than a notes inbox. Documents can be written on paginated A4-style paper, organized into Spaces, tagged, searched, revisited, and exported.
 
 The application is local-first: drafts, Spaces, metadata, and preferences are stored in the browser so the core writing flow remains fast and available without an account or cloud setup.
 
@@ -37,7 +37,7 @@ The application is local-first: drafts, Spaces, metadata, and preferences are st
 
 ### Writing workspace
 
-FlowSense now supports three writing modes: flowing Notes for quick capture, spacious Journals for personal entries, and paginated A4 Documents for print-oriented work. Existing saved documents keep Document mode for backward-compatible layout.
+Threadloom now supports three writing modes: flowing Notes for quick capture, spacious Journals for personal entries, and paginated A4 Documents for print-oriented work. Existing saved documents keep Document mode for backward-compatible layout.
 
 - A4-inspired paginated writing canvas with fixed margins and page numbers for Document mode
 - Flowing editor canvases for Note and Journal mode
@@ -156,7 +156,7 @@ npm run lint
 
 ## Design principles
 
-FlowSense follows a small set of product principles:
+Threadloom follows a small set of product principles:
 
 1. Writing should always be more prominent than assistance.
 2. Organization should be available without becoming overhead.
@@ -170,7 +170,7 @@ Planned work includes richer tag management, more advanced document relationship
 
 ## Contributing
 
-Thanks for taking an interest in FlowSense — contributions are welcome. A short guideline to get started:
+Thanks for taking an interest in Threadloom — contributions are welcome. A short guideline to get started:
 
 1. Fork the repository and create a feature branch: `git checkout -b feat/your-feature`
 2. Install dependencies: `npm install`
@@ -193,4 +193,4 @@ This project is currently an internal product prototype. Add a project-specific 
 
 ---
 
-Built with ❤️ by Keerti • Internal prototype.
+Built with ❤️ by Keerti • Threadloom prototype.

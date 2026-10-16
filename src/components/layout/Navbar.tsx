@@ -7,8 +7,8 @@ const tabs: Tab[] = ["home", "write", "history", "insights"];
 
 export default function Navbar({ activeTab, setActiveTab, onNew, onSave }: NavbarProps) {
   return <nav className="navbar">
-    <button className="brand" onClick={() => setActiveTab("write")} aria-label="FlowSense home">
-      <span className="brand-mark"><BookOpen size={16} strokeWidth={1.8} /></span><span>FlowSense</span>
+    <button className="brand" onClick={() => setActiveTab("write")} aria-label="Threadloom home">
+      <span className="brand-mark"><BookOpen size={16} strokeWidth={1.8} /></span><span>Threadloom</span>
     </button>
     <div className="navbar-center">
       {tabs.map((tab) => <button key={tab} className={`nav-link ${activeTab === tab ? "active" : ""}`} onClick={() => setActiveTab(tab)}>
