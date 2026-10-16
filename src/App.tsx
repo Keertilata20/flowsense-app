@@ -84,15 +84,20 @@ function App() {
   const handleNew = (space?: string) => { if (space) { setActiveSpace(space); setShowModePicker(true); } else { setActiveSpace(null); setShowModePicker(true); } };
   const downloadPDF = async () => {
     if (!text.trim()) return;
-    const { default: JsPDF } = await import("jspdf");
-    const pdf = new JsPDF({ unit: "mm", format: "a4" });
+    setNotice("Preparing PDF export…");
+    const [{ default: JsPDF }, { default: html2canvas }] = await Promise.all([import("jspdf"), import("html2canvas")]);
+    const pdf = new JsPDF({ unit: "mm", format: "a4", compress: true });
     const exportNode = globalThis.document.createElement("div");
     exportNode.innerHTML = sanitizeEditorHtml(text).replace(/<div data-threadloom-page-break="true"><\/div>/g, '<div style="page-break-before: always;"></div>');
     exportNode.style.width = "170mm";
+    exportNode.style.boxSizing = "border-box";
+    exportNode.style.paddingBottom = "12mm";
     exportNode.style.color = "#352b25";
     exportNode.style.fontFamily = "Inter, Arial, sans-serif";
     exportNode.style.fontSize = "12pt";
     exportNode.style.lineHeight = "1.55";
+    exportNode.style.overflowWrap = "anywhere";
+    exportNode.style.wordBreak = "break-word";
     exportNode.querySelectorAll("h1, h2, h3").forEach((heading) => { heading.setAttribute("style", "font-family: Georgia, serif; margin: 0 0 8pt; line-height: 1.2;"); });
     exportNode.querySelectorAll("blockquote").forEach((quote) => { quote.setAttribute("style", "border-left: 3px solid #bd927a; margin: 10pt 0; padding-left: 10pt; color: #785d4d;"); });
     exportNode.querySelectorAll("p, ul, ol, blockquote").forEach((block) => { if (!block.getAttribute("style")) block.setAttribute("style", "margin: 0 0 8pt;"); });
@@ -104,32 +109,76 @@ function App() {
     exportNode.style.backgroundColor = "#ffffff";
     globalThis.document.body.appendChild(exportNode);
     try {
-      await new Promise<void>((resolve, reject) => {
-        try {
-          pdf.html(exportNode, {
-            x: 20,
-            y: 20,
-            width: 170,
-            windowWidth: 794,
-            autoPaging: "text",
-            margin: [20, 20, 20, 20],
-            html2canvas: { scale: 1, backgroundColor: "#ffffff", useCORS: true },
-            callback: (result) => {
-              const pageCount = result.getNumberOfPages();
-              result.setFontSize(9);
-              result.setTextColor(145, 132, 122);
-              for (let page = 1; page <= pageCount; page += 1) { result.setPage(page); result.text(String(page), 105, 285, { align: "center" }); }
-              result.save("threadloom-writing.pdf");
-              resolve();
-            },
-          });
-        } catch (error) { reject(error); }
-      });
+      const canvas = await html2canvas(exportNode, { backgroundColor: "#ffffff", scale: 2.5, useCORS: true, logging: false, width: exportNode.scrollWidth, height: exportNode.scrollHeight, windowWidth: exportNode.scrollWidth });
+      const margin = 20;
+      const contentWidth = 170;
+      const contentHeight = 252;
+      const pixelsPerMillimetre = canvas.width / contentWidth;
+      const pageSliceHeight = Math.max(1, Math.floor(contentHeight * pixelsPerMillimetre));
+      const pageCount = Math.max(1, Math.ceil(canvas.height / pageSliceHeight));
+      for (let page = 0; page < pageCount; page += 1) {
+        if (page > 0) pdf.addPage();
+        const sourceY = page * pageSliceHeight;
+        const sliceHeight = Math.min(pageSliceHeight, canvas.height - sourceY);
+        const slice = globalThis.document.createElement("canvas");
+        slice.width = canvas.width;
+        slice.height = sliceHeight;
+        const context = slice.getContext("2d");
+        if (!context) throw new Error("Could not prepare PDF page");
+        context.fillStyle = "#ffffff";
+        context.fillRect(0, 0, slice.width, slice.height);
+        context.drawImage(canvas, 0, sourceY, canvas.width, sliceHeight, 0, 0, slice.width, slice.height);
+        const renderedHeight = sliceHeight / pixelsPerMillimetre;
+        pdf.addImage(slice.toDataURL("image/png"), "PNG", margin, margin, contentWidth, renderedHeight, undefined, "FAST");
+        pdf.setFont("helvetica", "normal");
+        pdf.setFontSize(9);
+        pdf.setTextColor(145, 132, 122);
+        pdf.text(`${page + 1} / ${pageCount}`, 105, 287, { align: "center" });
+      }
+      pdf.save("threadloom-writing.pdf");
+      setNotice("PDF downloaded.");
     } catch { setNotice("PDF export failed. Please try again."); }
     finally { exportNode.remove(); }
   };
-  const downloadDOCX = async () => { if (!text.trim()) return; const { Document, Packer, Paragraph } = await import("docx"); const document = new Document({ sections: [{ children: getPlainText(text).split(/\n/).map((line) => new Paragraph({ text: line })) }] }); saveAs(await Packer.toBlob(document), "threadloom-writing.docx"); };
-  const downloadTXT = () => { if (!text.trim()) return; saveAs(new Blob([getPlainText(text)], { type: "text/plain;charset=utf-8" }), "threadloom-writing.txt"); };
+  const downloadDOCX = async () => {
+    if (!text.trim()) return;
+    setNotice("Preparing Word export…");
+    const { AlignmentType, BorderStyle, Document, Footer, HeadingLevel, PageNumber, Packer, Paragraph, TextRun } = await import("docx");
+    const sanitized = sanitizeEditorHtml(text);
+    const parsed = new DOMParser().parseFromString(`<div>${sanitized}</div>`, "text/html");
+    type RunStyle = { bold?: boolean; italics?: boolean; underline?: object; font?: string; size?: number };
+    const runsFor = (node: Node, style: RunStyle = {}): InstanceType<typeof TextRun>[] => {
+      if (node.nodeType === Node.TEXT_NODE) return node.nodeValue ? [new TextRun({ text: node.nodeValue, ...style })] : [];
+      if (!(node instanceof Element)) return Array.from(node.childNodes).flatMap((child) => runsFor(child, style));
+      const nextStyle: RunStyle = { ...style };
+      if (node.matches("strong, b")) nextStyle.bold = true;
+      if (node.matches("em, i")) nextStyle.italics = true;
+      if (node.matches("u")) nextStyle.underline = {};
+      if (node.tagName === "FONT" && node.getAttribute("face")) nextStyle.font = node.getAttribute("face") ?? undefined;
+      if (node.tagName === "FONT" && node.getAttribute("size")) nextStyle.size = Math.max(16, Number(node.getAttribute("size")) * 2);
+      return Array.from(node.childNodes).flatMap((child) => runsFor(child, nextStyle));
+    };
+    const paragraphs: InstanceType<typeof Paragraph>[] = [];
+    const addBlock = (element: Element, listType?: "bullet" | "number") => {
+      if (element.matches("ul, ol")) { Array.from(element.children).filter((child) => child.matches("li")).forEach((child) => addBlock(child, element.tagName === "OL" ? "number" : "bullet")); return; }
+      if (element.matches("div[data-threadloom-page-break]")) { paragraphs.push(new Paragraph({ pageBreakBefore: true })); return; }
+      const children = runsFor(element);
+      if (!children.length) return;
+      const options: Record<string, unknown> = { children, spacing: { after: 160 } };
+      if (listType === "bullet") options.bullet = { level: 0 };
+      if (listType === "number") options.numbering = { reference: "threadloom-numbered", level: 0 };
+      if (element.matches("h1")) options.heading = HeadingLevel.HEADING_1;
+      if (element.matches("h2")) options.heading = HeadingLevel.HEADING_2;
+      if (element.matches("h3")) options.heading = HeadingLevel.HEADING_3;
+      if (element.matches("blockquote")) { options.indent = { left: 720 }; options.border = { left: { style: BorderStyle.SINGLE, size: 6, color: "BD927A", space: 8 } }; }
+      paragraphs.push(new Paragraph(options));
+    };
+    Array.from(parsed.body.firstElementChild?.children ?? []).forEach((element) => addBlock(element));
+    const document = new Document({ numbering: { config: [{ reference: "threadloom-numbered", levels: [{ level: 0, format: "decimal", text: "%1.", alignment: AlignmentType.LEFT }] }] }, sections: [{ footers: { default: new Footer({ children: [new Paragraph({ alignment: AlignmentType.CENTER, children: [new TextRun("Page "), new TextRun({ children: [PageNumber.CURRENT] }), new TextRun(" of "), new TextRun({ children: [PageNumber.TOTAL_PAGES] })] })] }) }, children: paragraphs }] });
+    saveAs(await Packer.toBlob(document), "threadloom-writing.docx");
+    setNotice("Word document downloaded.");
+  };
+  const downloadTXT = () => { if (!text.trim()) return; saveAs(new Blob([getPlainText(text)], { type: "text/plain;charset=utf-8" }), "threadloom-writing.txt"); setNotice("Plain text downloaded."); };
   const renameDraft = (id: string, title: string) => updateDocument(id, { title });
   const toggleFavorite = (id: string) => { const document = documents.find((item) => item.id === id); if (document) updateDocument(id, { favorite: !document.favorite }); };
   const moveDocument = (id: string, space: string) => updateDocument(id, { space, updatedAt: Date.now() });

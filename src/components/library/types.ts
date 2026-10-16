@@ -36,7 +36,21 @@ export type FlowDocument = {
 };
 
 export function getContent(document: Pick<FlowDocument, "content" | "text">) { return document.content ?? document.text ?? ""; }
-export function getPlainText(text: string) { return text.replace(/<(br|\/p|\/div|\/li|\/h[1-6]|\/blockquote)[^>]*>/gi, "\n").replace(/<[^>]*>/g, " ").replace(/&nbsp;/g, " ").replace(/&amp;/g, "&").replace(/&quot;/g, '"').replace(/&#39;/g, "'").replace(/\s+/g, " ").trim(); }
+export function getPlainText(text: string) {
+  if (!/<[a-z][\s\S]*>/i.test(text)) return text.replace(/[ \t]+/g, " ").replace(/\n{3,}/g, "\n\n").trim();
+  if (typeof DOMParser === "undefined") return text.replace(/<(br|\/p|\/div|\/li|\/h[1-6]|\/blockquote)[^>]*>/gi, "\n").replace(/<[^>]*>/g, " ").replace(/&nbsp;/g, " ").replace(/&amp;/g, "&").replace(/&quot;/g, '"').replace(/&#39;/g, "'").replace(/[ \t]+/g, " ").replace(/\n{3,}/g, "\n\n").trim();
+  const parsed = new DOMParser().parseFromString(`<div>${text}</div>`, "text/html");
+  const blockTags = new Set(["P", "DIV", "H1", "H2", "H3", "BLOCKQUOTE"]);
+  const walk = (node: Node): string => {
+    if (node.nodeType === Node.TEXT_NODE) return node.nodeValue ?? "";
+    if (!(node instanceof Element)) return Array.from(node.childNodes).map(walk).join("");
+    if (node.tagName === "BR") return "\n";
+    const prefix = node.tagName === "LI" ? "- " : "";
+    const body = Array.from(node.childNodes).map(walk).join("");
+    return `${prefix}${body}${blockTags.has(node.tagName) || node.tagName === "LI" ? "\n" : ""}`;
+  };
+  return walk(parsed.body.firstElementChild ?? parsed.body).replace(/[ \t]+/g, " ").replace(/ *\n */g, "\n").replace(/\n{3,}/g, "\n\n").trim();
+}
 export function getEditorHtml(text: string) {
   if (!text.trim()) return "";
   if (/<[a-z][\s\S]*>/i.test(text)) return text;
@@ -50,7 +64,7 @@ export function sanitizeEditorHtml(text: string) {
   const allowed = new Set(["P", "BR", "STRONG", "B", "EM", "I", "U", "H1", "H2", "H3", "UL", "OL", "LI", "BLOCKQUOTE", "FONT", "DIV"]);
   parsed.body.querySelectorAll("*").forEach((element) => {
     if (!allowed.has(element.tagName)) { element.replaceWith(...Array.from(element.childNodes)); return; }
-    Array.from(element.attributes).forEach((attribute) => { if (attribute.name !== "data-checklist" && attribute.name !== "face" && attribute.name !== "size") element.removeAttribute(attribute.name); });
+    Array.from(element.attributes).forEach((attribute) => { if (attribute.name !== "data-checklist" && attribute.name !== "data-threadloom-page-break" && attribute.name !== "face" && attribute.name !== "size") element.removeAttribute(attribute.name); });
   });
   return parsed.body.firstElementChild?.innerHTML ?? "";
 }
