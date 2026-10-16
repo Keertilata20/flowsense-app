@@ -96,30 +96,37 @@ function App() {
     exportNode.querySelectorAll("h1, h2, h3").forEach((heading) => { heading.setAttribute("style", "font-family: Georgia, serif; margin: 0 0 8pt; line-height: 1.2;"); });
     exportNode.querySelectorAll("blockquote").forEach((quote) => { quote.setAttribute("style", "border-left: 3px solid #bd927a; margin: 10pt 0; padding-left: 10pt; color: #785d4d;"); });
     exportNode.querySelectorAll("p, ul, ol, blockquote").forEach((block) => { if (!block.getAttribute("style")) block.setAttribute("style", "margin: 0 0 8pt;"); });
-    exportNode.style.position = "fixed";
-    exportNode.style.left = "-100000px";
+    exportNode.style.position = "absolute";
+    exportNode.style.left = "0";
     exportNode.style.top = "0";
+    exportNode.style.zIndex = "-1";
+    exportNode.setAttribute("aria-hidden", "true");
+    exportNode.style.backgroundColor = "#ffffff";
     globalThis.document.body.appendChild(exportNode);
-    await new Promise<void>((resolve) => {
-      pdf.html(exportNode, {
-        x: 20,
-        y: 20,
-        width: 170,
-        windowWidth: 794,
-        autoPaging: "text",
-        margin: [20, 20, 20, 20],
-        html2canvas: { scale: 1, backgroundColor: "#ffffff" },
-        callback: (result) => {
-          const pageCount = result.getNumberOfPages();
-          result.setFontSize(9);
-          result.setTextColor(145, 132, 122);
-          for (let page = 1; page <= pageCount; page += 1) { result.setPage(page); result.text(String(page), 105, 285, { align: "center" }); }
-          result.save("threadloom-writing.pdf");
-          resolve();
-        },
+    try {
+      await new Promise<void>((resolve, reject) => {
+        try {
+          pdf.html(exportNode, {
+            x: 20,
+            y: 20,
+            width: 170,
+            windowWidth: 794,
+            autoPaging: "text",
+            margin: [20, 20, 20, 20],
+            html2canvas: { scale: 1, backgroundColor: "#ffffff", useCORS: true },
+            callback: (result) => {
+              const pageCount = result.getNumberOfPages();
+              result.setFontSize(9);
+              result.setTextColor(145, 132, 122);
+              for (let page = 1; page <= pageCount; page += 1) { result.setPage(page); result.text(String(page), 105, 285, { align: "center" }); }
+              result.save("threadloom-writing.pdf");
+              resolve();
+            },
+          });
+        } catch (error) { reject(error); }
       });
-    });
-    exportNode.remove();
+    } catch { setNotice("PDF export failed. Please try again."); }
+    finally { exportNode.remove(); }
   };
   const downloadDOCX = async () => { if (!text.trim()) return; const { Document, Packer, Paragraph } = await import("docx"); const document = new Document({ sections: [{ children: getPlainText(text).split(/\n/).map((line) => new Paragraph({ text: line })) }] }); saveAs(await Packer.toBlob(document), "threadloom-writing.docx"); };
   const downloadTXT = () => { if (!text.trim()) return; saveAs(new Blob([getPlainText(text)], { type: "text/plain;charset=utf-8" }), "threadloom-writing.txt"); };
