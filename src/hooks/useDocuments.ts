@@ -17,11 +17,11 @@ export function useDocuments() {
   const createDocument = useCallback((content: string, space: string, mode: WritingMode = "note") => {
     const now = Date.now();
     const document = normalizeDocument({ id: crypto.randomUUID(), title: "", content, space, mode, createdAt: now, updatedAt: now, wordCount: getWordCount(content), readingTime: getReadingMinutes(content), favorite: false, status: "draft" });
-    setDocuments((current) => [document, ...current].slice(0, 50));
+    setDocuments((current) => [document, ...current]);
     return document;
   }, []);
-  const updateDocument = useCallback((id: string, patch: Partial<FlowDocument>) => update((current) => current.map((document) => document.id === id ? normalizeDocument({ ...document, ...patch }) : document)), [update]);
+  const updateDocument = useCallback((id: string, patch: Partial<FlowDocument>) => update((current) => current.map((document) => document.id === id ? normalizeDocument({ ...document, ...patch, updatedAt: patch.updatedAt ?? Date.now() }) : document)), [update]);
   const deleteDocument = useCallback((id: string) => update((current) => current.filter((document) => document.id !== id)), [update]);
-  const duplicateDocument = useCallback((id: string) => { let copy: FlowDocument | undefined; setDocuments((current) => { const source = current.find((document) => document.id === id); if (!source) return current; const now = Date.now(); copy = { ...source, id: crypto.randomUUID(), title: `${source.title} copy`, createdAt: now, updatedAt: now, favorite: false }; return [copy, ...current].slice(0, 50); }); return copy; }, []);
+  const duplicateDocument = useCallback((id: string) => { let copy: FlowDocument | undefined; setDocuments((current) => { const source = current.find((document) => document.id === id); if (!source) return current; const now = Date.now(); copy = { ...source, id: crypto.randomUUID(), title: `${source.title} copy`, createdAt: now, updatedAt: now, favorite: false }; return [copy, ...current]; }); return copy; }, []);
   return { documents, createDocument, updateDocument, deleteDocument, duplicateDocument };
 }
