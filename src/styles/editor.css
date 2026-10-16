@@ -1,3 +1,40 @@
+.rich-editor h1,
+.rich-editor h2,
+.rich-editor h3 {
+  margin: 1.15em 0 0.45em;
+  font-family: "Instrument Serif", Georgia, serif;
+  line-height: 1.2;
+}
+
+.rich-editor h1 { font-size: 1.8em; }
+.rich-editor h2 { font-size: 1.5em; }
+.rich-editor h3 { font-size: 1.25em; }
+
+.rich-editor ul:not([data-checklist]) {
+  list-style: disc;
+  padding-left: 1.5rem;
+}
+
+.rich-editor ol {
+  list-style: decimal;
+  padding-left: 1.5rem;
+}
+
+.rich-editor li { padding-left: 0.15rem; }
+
+.rich-editor blockquote {
+  margin: 0.8em 0;
+  border-left: 3px solid #bd927a;
+  padding-left: 1rem;
+  color: #785d4d;
+}
+
+.rich-editor u {
+  text-decoration-line: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 2px;
+}
+
 .rich-editor ul[data-checklist] {
   list-style: none;
   padding-left: 1.5rem;
