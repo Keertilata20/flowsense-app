@@ -84,21 +84,22 @@ function App() {
   const handleNew = (space?: string) => { if (space) { setActiveSpace(space); setShowModePicker(true); } else { setActiveSpace(null); setShowModePicker(true); } };
   const downloadPDF = async () => {
     if (!text.trim()) return;
+    const exportText = text;
     setNotice("Preparing PDF export…");
     const [{ default: JsPDF }, { default: html2canvas }] = await Promise.all([import("jspdf"), import("html2canvas")]);
     const pdf = new JsPDF({ unit: "mm", format: "a4", compress: true });
     const exportNode = globalThis.document.createElement("div");
-    exportNode.innerHTML = sanitizeEditorHtml(text).replace(/<div data-threadloom-page-break="true"><\/div>/g, '<div style="page-break-before: always;"></div>');
+    exportNode.innerHTML = sanitizeEditorHtml(exportText).replace(/<div data-threadloom-page-break="true"><\/div>/g, '<div style="page-break-before: always;"></div>');
     exportNode.style.width = "170mm";
     exportNode.style.boxSizing = "border-box";
     exportNode.style.paddingBottom = "12mm";
     exportNode.style.color = "#352b25";
-    exportNode.style.fontFamily = "Inter, Arial, sans-serif";
+    exportNode.style.fontFamily = "'Instrument Serif', Georgia, serif";
     exportNode.style.fontSize = "12pt";
     exportNode.style.lineHeight = "1.55";
     exportNode.style.overflowWrap = "anywhere";
     exportNode.style.wordBreak = "break-word";
-    exportNode.querySelectorAll("h1, h2, h3").forEach((heading) => { heading.setAttribute("style", "font-family: Georgia, serif; margin: 0 0 8pt; line-height: 1.2;"); });
+    exportNode.querySelectorAll("h1, h2, h3").forEach((heading) => { const element = heading as HTMLElement; element.style.margin = "0 0 8pt"; element.style.lineHeight = "1.2"; });
     exportNode.querySelectorAll("blockquote").forEach((quote) => { quote.setAttribute("style", "border-left: 3px solid #bd927a; margin: 10pt 0; padding-left: 10pt; color: #785d4d;"); });
     exportNode.querySelectorAll("p, ul, ol, blockquote").forEach((block) => { if (!block.getAttribute("style")) block.setAttribute("style", "margin: 0 0 8pt;"); });
     exportNode.style.position = "absolute";
@@ -142,14 +143,16 @@ function App() {
   };
   const downloadDOCX = async () => {
     if (!text.trim()) return;
+    const exportText = text;
     setNotice("Preparing Word export…");
     const { AlignmentType, BorderStyle, Document, Footer, HeadingLevel, PageNumber, Packer, Paragraph, TextRun } = await import("docx");
-    const sanitized = sanitizeEditorHtml(text);
+    const sanitized = sanitizeEditorHtml(exportText);
     const parsed = new DOMParser().parseFromString(`<div>${sanitized}</div>`, "text/html");
     type RunStyle = { bold?: boolean; italics?: boolean; underline?: object; font?: string; size?: number };
     const runsFor = (node: Node, style: RunStyle = {}): InstanceType<typeof TextRun>[] => {
       if (node.nodeType === Node.TEXT_NODE) return node.nodeValue ? [new TextRun({ text: node.nodeValue, ...style })] : [];
       if (!(node instanceof Element)) return Array.from(node.childNodes).flatMap((child) => runsFor(child, style));
+      if (node.tagName === "BR") return [new TextRun({ break: 1 })];
       const nextStyle: RunStyle = { ...style };
       if (node.matches("strong, b")) nextStyle.bold = true;
       if (node.matches("em, i")) nextStyle.italics = true;
@@ -162,8 +165,8 @@ function App() {
     const addBlock = (element: Element, listType?: "bullet" | "number") => {
       if (element.matches("ul, ol")) { Array.from(element.children).filter((child) => child.matches("li")).forEach((child) => addBlock(child, element.tagName === "OL" ? "number" : "bullet")); return; }
       if (element.matches("div[data-threadloom-page-break]")) { paragraphs.push(new Paragraph({ pageBreakBefore: true })); return; }
-      const children = runsFor(element);
-      if (!children.length) return;
+      const children = runsFor(element, { font: "Instrument Serif", size: 28 });
+      if (!children.length) { paragraphs.push(new Paragraph({ spacing: { after: 160 } })); return; }
       const options: Record<string, unknown> = { children, spacing: { after: 160 } };
       if (listType === "bullet") options.bullet = { level: 0 };
       if (listType === "number") options.numbering = { reference: "threadloom-numbered", level: 0 };
@@ -178,7 +181,7 @@ function App() {
     saveAs(await Packer.toBlob(document), "threadloom-writing.docx");
     setNotice("Word document downloaded.");
   };
-  const downloadTXT = () => { if (!text.trim()) return; saveAs(new Blob([getPlainText(text)], { type: "text/plain;charset=utf-8" }), "threadloom-writing.txt"); setNotice("Plain text downloaded."); };
+  const downloadTXT = () => { if (!text.trim()) return; const exportText = text; saveAs(new Blob([getPlainText(exportText)], { type: "text/plain;charset=utf-8" }), "threadloom-writing.txt"); setNotice("Plain text downloaded."); };
   const renameDraft = (id: string, title: string) => updateDocument(id, { title });
   const toggleFavorite = (id: string) => { const document = documents.find((item) => item.id === id); if (document) updateDocument(id, { favorite: !document.favorite }); };
   const moveDocument = (id: string, space: string) => updateDocument(id, { space, updatedAt: Date.now() });
