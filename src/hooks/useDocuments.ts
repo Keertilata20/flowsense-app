@@ -12,7 +12,7 @@ function readDocuments() {
 
 export function useDocuments() {
   const [documents, setDocuments] = useState<FlowDocument[]>(readDocuments);
-  useEffect(() => { localStorage.setItem(STORAGE_KEY, JSON.stringify(documents)); }, [documents]);
+  useEffect(() => { try { localStorage.setItem(STORAGE_KEY, JSON.stringify(documents)); } catch (error) { console.error("Threadloom could not save documents", error); } }, [documents]);
   const update = useCallback((updater: (current: FlowDocument[]) => FlowDocument[]) => setDocuments(updater), []);
   const createDocument = useCallback((content: string, space: string, mode: WritingMode = "note") => {
     const now = Date.now();
@@ -23,5 +23,6 @@ export function useDocuments() {
   const updateDocument = useCallback((id: string, patch: Partial<FlowDocument>) => update((current) => current.map((document) => document.id === id ? normalizeDocument({ ...document, ...patch, updatedAt: patch.updatedAt ?? Date.now() }) : document)), [update]);
   const deleteDocument = useCallback((id: string) => update((current) => current.filter((document) => document.id !== id)), [update]);
   const duplicateDocument = useCallback((id: string) => { let copy: FlowDocument | undefined; setDocuments((current) => { const source = current.find((document) => document.id === id); if (!source) return current; const now = Date.now(); copy = { ...source, id: crypto.randomUUID(), title: `${source.title} copy`, createdAt: now, updatedAt: now, favorite: false }; return [copy, ...current]; }); return copy; }, []);
-  return { documents, createDocument, updateDocument, deleteDocument, duplicateDocument };
+  const replaceDocuments = useCallback((nextDocuments: FlowDocument[]) => setDocuments(nextDocuments.map(normalizeDocument)), []);
+  return { documents, createDocument, updateDocument, deleteDocument, duplicateDocument, replaceDocuments };
 }

@@ -36,7 +36,24 @@ export type FlowDocument = {
 };
 
 export function getContent(document: Pick<FlowDocument, "content" | "text">) { return document.content ?? document.text ?? ""; }
-export function getPlainText(text: string) { return text.replace(/<[^>]*>/g, " ").replace(/&nbsp;/g, " ").replace(/&amp;/g, "&").replace(/\s+/g, " ").trim(); }
+export function getPlainText(text: string) { return text.replace(/<(br|\/p|\/div|\/li|\/h[1-6]|\/blockquote)[^>]*>/gi, "\n").replace(/<[^>]*>/g, " ").replace(/&nbsp;/g, " ").replace(/&amp;/g, "&").replace(/&quot;/g, '"').replace(/&#39;/g, "'").replace(/\s+/g, " ").trim(); }
+export function getEditorHtml(text: string) {
+  if (!text.trim()) return "";
+  if (/<[a-z][\s\S]*>/i.test(text)) return text;
+  const escapeHtml = (value: string) => value.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+  return text.split(/\n\n+/).map((paragraph) => `<p>${escapeHtml(paragraph).replace(/\n/g, "<br />")}</p>`).join("");
+}
+export function sanitizeEditorHtml(text: string) {
+  const html = getEditorHtml(text);
+  if (typeof DOMParser === "undefined") return html;
+  const parsed = new DOMParser().parseFromString(`<div>${html}</div>`, "text/html");
+  const allowed = new Set(["P", "BR", "STRONG", "B", "EM", "I", "U", "H1", "H2", "H3", "UL", "OL", "LI", "BLOCKQUOTE", "FONT", "DIV"]);
+  parsed.body.querySelectorAll("*").forEach((element) => {
+    if (!allowed.has(element.tagName)) { element.replaceWith(...Array.from(element.childNodes)); return; }
+    Array.from(element.attributes).forEach((attribute) => { if (attribute.name !== "data-checklist" && attribute.name !== "face" && attribute.name !== "size") element.removeAttribute(attribute.name); });
+  });
+  return parsed.body.firstElementChild?.innerHTML ?? "";
+}
 export function getWordCount(text: string) { const plain = getPlainText(text); return plain ? plain.split(/\s+/).length : 0; }
 export function getReadingMinutes(text: string) { return Math.max(1, Math.ceil(getWordCount(text) / 200)); }
 export function getDocumentTitle(document: Pick<FlowDocument, "content" | "text" | "title">) {

@@ -9,7 +9,7 @@ export function useSpaces() {
       return Array.isArray(stored) ? [...getDefaultSpaces(), ...stored.filter((space) => space?.custom && space.id && space.label)] : getDefaultSpaces();
     } catch { return getDefaultSpaces(); }
   });
-  useEffect(() => { localStorage.setItem(STORAGE_KEY, JSON.stringify(spaces.filter((space) => space.custom))); }, [spaces]);
+  useEffect(() => { try { localStorage.setItem(STORAGE_KEY, JSON.stringify(spaces.filter((space) => space.custom))); } catch (error) { console.error("Threadloom could not save Spaces", error); } }, [spaces]);
   const createSpace = (label: string, icon = "folder") => {
     const cleanLabel = label.trim();
     if (!cleanLabel) return null;
@@ -18,5 +18,6 @@ export function useSpaces() {
     setSpaces((current) => [...current, space]);
     return space;
   };
-  return { spaces, createSpace };
+  const replaceSpaces = (nextSpaces: SpaceDefinition[]) => setSpaces([...getDefaultSpaces(), ...nextSpaces.filter((space) => space.custom && space.id && space.label)]);
+  return { spaces, createSpace, replaceSpaces };
 }

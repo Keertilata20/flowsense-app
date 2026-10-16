@@ -1,0 +1,10 @@
+.rich-editor ul[data-checklist] {
+  list-style: none;
+  padding-left: 1.5rem;
+}
+
+.rich-editor ul[data-checklist] li::before {
+  content: "☐";
+  margin-left: -1.5rem;
+  margin-right: 0.5rem;
+}
